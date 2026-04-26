@@ -5,7 +5,7 @@ import { getPublishedArtworks } from '@/lib/data/artworks-db'
 export const metadata: Metadata = {
   title: 'Works',
   description:
-    'Browse fine art prints by Lara Stoco — archival cotton rag and canvas prints of original mixed-media collages.',
+    'Browse fine art prints by Lara Stocco — archival cotton rag and canvas prints of original mixed-media collages.',
 }
 
 export default async function WorksPage() {

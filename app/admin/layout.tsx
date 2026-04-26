@@ -8,7 +8,7 @@ export const metadata = { title: { default: 'Studio — Domestic Eclectic', temp
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return (
-      <AdminShell userInitials="LS" userName="Lara Stoco">
+      <AdminShell userInitials="LS" userName="Lara Stocco">
         {children}
       </AdminShell>
     )

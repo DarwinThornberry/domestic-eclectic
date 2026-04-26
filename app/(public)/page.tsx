@@ -7,7 +7,7 @@ import { SITE_DESCRIPTION } from '@/lib/constants'
 import type { ArtworkData } from '@/lib/data/artworks'
 
 export const metadata: Metadata = {
-  title: 'Domestic Eclectic — Fine Art Prints by Lara Stoco',
+  title: 'Domestic Eclectic — Fine Art Prints by Lara Stocco',
   description: SITE_DESCRIPTION,
 }
 
@@ -95,7 +95,7 @@ export default async function HomePage() {
       <section className="border-t border-border mt-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16 lg:py-20">
           <p className="font-display text-2xl md:text-3xl lg:text-[2.25rem] italic text-ink leading-snug max-w-3xl">
-            Domestic Eclectic is the studio practice of Lara Stoco — collages built
+            Domestic Eclectic is the studio practice of Lara Stocco — collages built
             from art history, botany, and the quiet mythology of the everyday.
           </p>
         </div>
@@ -185,7 +185,7 @@ export default async function HomePage() {
               {/* [PLACEHOLDER] — Lara to update this text */}
               <div className="flex flex-col gap-5 text-ink-muted leading-relaxed">
                 <p>
-                  Lara Stoco&apos;s practice begins in the archive — art books opened
+                  Lara Stocco&apos;s practice begins in the archive — art books opened
                   to Botticelli, Vermeer, Frida Kahlo; botanical illustration
                   folios; Victorian shell catalogues; faded portrait photography.
                   These fragments are torn, cut, painted over, layered, and

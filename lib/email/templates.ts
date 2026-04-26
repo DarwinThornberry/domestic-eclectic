@@ -60,7 +60,7 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
 <div style="${styles.wrap}">
   ${wordmark()}
   <h2 style="${styles.h2}">New Drop Ship Order</h2>
-  <p style="${styles.lead}">Please print and ship the following order directly to the customer. This order is for Domestic Eclectic, managed by Lara Stoco.</p>
+  <p style="${styles.lead}">Please print and ship the following order directly to the customer. This order is for Domestic Eclectic, managed by Lara Stocco.</p>
 
   <p style="${styles.sectionLabel}">Order</p>
   <p style="${styles.small}"><strong>${order.order_number}</strong> · Placed ${new Date(order.created_at).toLocaleDateString('en-AU', { dateStyle: 'long' })}</p>
@@ -86,8 +86,8 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
   <p style="${styles.totalFinal}">Total: ${formatCents(order.total_aud)}</p>
 
   <p style="${styles.footer}">
-    Questions about this order? Contact Lara Stoco at lara@domesticeclectic.com.au<br>
-    Domestic Eclectic · Fine Art Prints by Lara Stoco
+    Questions about this order? Contact Lara Stocco at lara@domesticeclectic.com.au<br>
+    Domestic Eclectic · Fine Art Prints by Lara Stocco
   </p>
 </div>
 </body></html>`
@@ -120,7 +120,7 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
   <p style="${styles.small}" style="margin-top: 12px;">Questions? Reply to this email or visit <a href="https://domesticeclectic.com.au/contact" style="color: #9A6B4F;">our contact page</a>.</p>
 
   <p style="${styles.footer}">
-    Domestic Eclectic · Fine Art Prints by Lara Stoco<br>
+    Domestic Eclectic · Fine Art Prints by Lara Stocco<br>
     Printed and fulfilled by Southern Buoy, Mornington VIC
   </p>
 </div>
@@ -171,7 +171,7 @@ export function shippedNotificationHtml(order: OrderWithItems, trackingNumber?: 
 
   <p style="${styles.footer}">
     Questions? Reply to this email.<br>
-    Domestic Eclectic · Fine Art Prints by Lara Stoco
+    Domestic Eclectic · Fine Art Prints by Lara Stocco
   </p>
 </div>
 </body></html>`

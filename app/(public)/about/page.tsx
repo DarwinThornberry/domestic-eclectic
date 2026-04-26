@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'About Lara Stoco — Melbourne-based artist and creator of Domestic Eclectic.',
+  description: 'About Lara Stocco — Melbourne-based artist and creator of Domestic Eclectic.',
 }
 
 export default function AboutPage() {
@@ -22,12 +22,12 @@ export default function AboutPage() {
         <div className="order-2 lg:order-none">
           <p className="caption text-terracotta mb-4">About</p>
           <h1 className="font-display text-4xl md:text-5xl italic text-ink mb-8 leading-tight">
-            Lara Stoco
+            Lara Stocco
           </h1>
 
           <div className="flex flex-col gap-5 text-ink-muted leading-relaxed">
             <p>
-              Lara Stoco is a Melbourne-based mixed-media artist whose work draws
+              Lara Stocco is a Melbourne-based mixed-media artist whose work draws
               from the deep archives of art history — Botticelli&apos;s gilded
               figures, Vermeer&apos;s interior light, Frida Kahlo&apos;s
               unflinching self-regard — and layers them against botanical

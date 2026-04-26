@@ -1,7 +1,7 @@
 export const SITE_NAME = 'Domestic Eclectic'
-export const SITE_TAGLINE = 'Fine Art Prints by Lara Stoco'
+export const SITE_TAGLINE = 'Fine Art Prints by Lara Stocco'
 export const SITE_DESCRIPTION =
-  'Fine art prints of original mixed-media collages by Australian artist Lara Stoco. Printed on archival cotton rag and canvas by Southern Buoy, Mornington.'
+  'Fine art prints of original mixed-media collages by Australian artist Lara Stocco. Printed on archival cotton rag and canvas by Southern Buoy, Mornington.'
 
 export const PRINTER_EMAIL = process.env.PRINTER_EMAIL ?? 'southernbuoy@gmail.com'
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ''

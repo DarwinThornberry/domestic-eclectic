@@ -112,7 +112,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
               </div>
               <div>
                 <p className="caption text-ink-muted mb-1">ARTIST</p>
-                <p className="text-ink text-sm">Lara Stoco</p>
+                <p className="text-ink text-sm">Lara Stocco</p>
               </div>
               <div>
                 <p className="caption text-ink-muted mb-1">FULFILMENT</p>

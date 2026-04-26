@@ -17,7 +17,7 @@ export function Footer() {
               <p className="wordmark-domestic text-ink">DOMESTIC</p>
               <p className="wordmark-eclectic text-ink">Eclectic</p>
             </div>
-            <p className="caption text-ink-muted">by Lara Stoco</p>
+            <p className="caption text-ink-muted">by Lara Stocco</p>
             <p className="text-sm text-ink-muted leading-relaxed mt-2">
               Fine art prints of original mixed-media collages,
               printed on archival materials in Mornington, Victoria.
@@ -86,7 +86,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="border-t border-border py-5 flex flex-col md:flex-row justify-between gap-3">
           <p className="text-xs text-ink-muted">
-            © {year} Lara Stoco · Domestic Eclectic. All rights reserved.
+            © {year} Lara Stocco · Domestic Eclectic. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
             <p className="text-xs text-ink-muted">

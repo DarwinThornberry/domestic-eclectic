@@ -1,6 +1,6 @@
 # Domestic Eclectic
 
-Fine art print-on-demand store for Melbourne artist Lara Stoco. Built with Next.js 16, Tailwind v4, Supabase, and Stripe.
+Fine art print-on-demand store for Melbourne artist Lara Stocco. Built with Next.js 16, Tailwind v4, Supabase, and Stripe.
 
 ## Architecture
 
