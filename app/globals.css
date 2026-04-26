@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Palette */
+  --color-bone:        #F5F1EA;
+  --color-bone-dark:   #EDE8DF;
+  --color-ink:         #1A1814;
+  --color-ink-muted:   #4A4540;
+  --color-terracotta:  #9A6B4F;
+  --color-olive:       #5B6B47;
+  --color-border:      #E5DFD5;
+  --color-border-dark: #C8C0B0;
+
+  /* Typography */
+  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-body:    var(--font-inter-tight), 'Inter Tight', system-ui, sans-serif;
+
+  /* Spacing extras */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+}
+
+/* ─── Base Styles ───────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #F5F1EA;
+  color: #1A1814;
+  font-family: var(--font-body);
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.65;
+}
+
+/* Display headings use Cormorant Garamond */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* Hairline rules */
+hr {
+  border: none;
+  border-top: 1px solid #E5DFD5;
+}
+
+/* Focus ring — minimal, accessible */
+:focus-visible {
+  outline: 1px solid #9A6B4F;
+  outline-offset: 3px;
+}
+
+/* Image defaults */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── Typography Utilities ──────────────────────────────────────────────────── */
+
+.font-display    { font-family: var(--font-display); }
+.font-body       { font-family: var(--font-body); }
+.tracking-widest { letter-spacing: 0.18em; }
+
+/* Wordmark — used in Nav */
+.wordmark-domestic {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.wordmark-eclectic {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* Editorial caption style */
+.caption {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4A4540;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out forwards;
+}
