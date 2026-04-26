@@ -2,10 +2,16 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/server'
 import { ArtworkList } from '@/components/admin/ArtworkList'
+import { DeletedBanner } from '@/components/admin/DeletedBanner'
 
 export const metadata = { title: 'Works' }
 
-export default async function ArtworksPage() {
+interface Props {
+  searchParams: Promise<{ deleted?: string }>
+}
+
+export default async function ArtworksPage({ searchParams }: Props) {
+  const { deleted } = await searchParams
   let artworks: any[] = []
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -33,6 +39,8 @@ export default async function ArtworksPage() {
           <Plus size={13} /> Add new work
         </Link>
       </div>
+
+      {deleted && <DeletedBanner title={decodeURIComponent(deleted)} />}
 
       {!process.env.NEXT_PUBLIC_SUPABASE_URL ? (
         <div className="border border-border p-8">

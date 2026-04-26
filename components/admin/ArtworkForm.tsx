@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/ImageUpload'
-import { saveArtwork, archiveArtwork } from '@/app/admin/actions'
+import { saveArtwork, archiveArtwork, deleteArtwork } from '@/app/admin/actions'
+import { DeleteArtworkModal } from '@/components/admin/DeleteArtworkModal'
 
 interface ArtworkData {
   id?: string
@@ -58,6 +59,8 @@ export function ArtworkForm({ artwork }: Props) {
   const isEditing = !!artwork?.id
   const [isPending, startTransition] = useTransition()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [savedStatus, setSavedStatus] = useState<string | null>(null)
 
@@ -104,6 +107,18 @@ export function ArtworkForm({ artwork }: Props) {
     })
   }
 
+  function handlePermanentDelete() {
+    startTransition(async () => {
+      try {
+        const title = await deleteArtwork(artwork!.id!)
+        router.push('/admin/artworks?deleted=' + encodeURIComponent(title))
+      } catch (e: any) {
+        setDeleteError(e.message ?? 'Could not delete. Please try again.')
+        setShowPermanentDeleteModal(false)
+      }
+    })
+  }
+
   function handleArchive() {
     startTransition(async () => {
       try {
@@ -117,6 +132,16 @@ export function ArtworkForm({ artwork }: Props) {
 
   return (
     <div className="max-w-2xl">
+      {showPermanentDeleteModal && artwork?.id && (
+        <DeleteArtworkModal
+          artworkTitle={form.title}
+          onConfirm={handlePermanentDelete}
+          onCancel={() => { setShowPermanentDeleteModal(false); setDeleteError(null) }}
+          isPending={isPending}
+          error={deleteError}
+        />
+      )}
+
       {error && (
         <div className="border border-terracotta/30 bg-terracotta/5 px-4 py-3 mb-6">
           <p className="text-sm text-terracotta">{error}</p>
@@ -362,6 +387,18 @@ export function ArtworkForm({ artwork }: Props) {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Permanent delete */}
+        {isEditing && (
+          <div className="pt-6 border-t border-border mt-2">
+            <button
+              onClick={() => setShowPermanentDeleteModal(true)}
+              className="text-xs text-ink-muted hover:text-terracotta transition-colors"
+            >
+              Delete this work permanently
+            </button>
           </div>
         )}
       </div>

@@ -122,6 +122,63 @@ export async function saveArtwork(
   revalidatePath('/works')
 }
 
+export async function deleteArtwork(artworkId: string): Promise<string> {
+  const supabase = createAdminClient()
+
+  const { data: artwork, error: fetchError } = await supabase
+    .from('artworks')
+    .select('title, thumbnail_url, gallery_images, hi_res_file_url')
+    .eq('id', artworkId)
+    .single()
+
+  if (fetchError || !artwork) throw new Error('Artwork not found')
+
+  const title = artwork.title as string
+
+  function extractPublicPath(url: string): string | null {
+    const marker = '/object/public/artwork-public/'
+    const idx = url.indexOf(marker)
+    return idx >= 0 ? url.slice(idx + marker.length) : null
+  }
+
+  try {
+    const paths: string[] = []
+    if (artwork.thumbnail_url) {
+      const p = extractPublicPath(artwork.thumbnail_url)
+      if (p) paths.push(p)
+    }
+    for (const url of (artwork.gallery_images ?? [])) {
+      const p = extractPublicPath(url)
+      if (p) paths.push(p)
+    }
+    if (paths.length > 0) {
+      const { error } = await supabase.storage.from('artwork-public').remove(paths)
+      if (error) console.error('[deleteArtwork] public image deletion failed:', error.message)
+    }
+  } catch (e) {
+    console.error('[deleteArtwork] public storage error:', e)
+  }
+
+  try {
+    if (artwork.hi_res_file_url) {
+      const { error } = await supabase.storage
+        .from('artwork-hires')
+        .remove([artwork.hi_res_file_url])
+      if (error) console.error('[deleteArtwork] hires deletion failed:', error.message)
+    }
+  } catch (e) {
+    console.error('[deleteArtwork] hires storage error:', e)
+  }
+
+  const { error } = await supabase.from('artworks').delete().eq('id', artworkId)
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/admin/artworks')
+  revalidatePath('/works', 'layout')
+
+  return title
+}
+
 export async function archiveArtwork(artworkId: string) {
   const supabase = createAdminClient()
   const { error } = await supabase
