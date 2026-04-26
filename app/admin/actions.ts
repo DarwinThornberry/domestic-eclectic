@@ -112,10 +112,16 @@ export async function saveArtwork(
 
   if (artworkId) {
     const { error } = await supabase.from('artworks').update(data).eq('id', artworkId)
-    if (error) throw new Error(error.message)
+    if (error) {
+      if (error.code === '23505') throw new Error('A work with that slug already exists. Change the slug and try again.')
+      throw new Error(error.message)
+    }
   } else {
     const { error } = await supabase.from('artworks').insert(data)
-    if (error) throw new Error(error.message)
+    if (error) {
+      if (error.code === '23505') throw new Error('A work with that slug already exists. Change the slug and try again.')
+      throw new Error(error.message)
+    }
   }
 
   revalidatePath('/admin/artworks')

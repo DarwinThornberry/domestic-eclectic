@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
       .from('launch_signups')
       .insert({ email: trimmed, source: source ?? null })
 
-    // Unique constraint violation — they already signed up; still return success
-    if (error && !error.message.includes('duplicate')) {
+    // Unique constraint violation (23505) — already signed up; still return success
+    if (error && error.code !== '23505') {
       console.error('[launch-signup]', error.message)
       return NextResponse.json({ error: 'Could not save your email. Please try again.' }, { status: 500 })
     }

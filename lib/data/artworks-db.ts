@@ -44,6 +44,7 @@ function toArtworkData(row: ArtworkRow): ArtworkData {
   const fallbackPath = `/artworks/web/${row.slug}.png`
   const r = row as any
   return {
+    id: row.id,
     slug: row.slug,
     title: row.title,
     year: row.year,

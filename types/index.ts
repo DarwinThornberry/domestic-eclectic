@@ -164,7 +164,7 @@ export interface OrderWithItems extends Order {
 // Cart types (client-side, localStorage)
 export interface CartItem {
   id: string            // local uuid for cart management
-  artwork_id: string    // slug for now; real UUID in Phase 4 when Supabase is connected
+  artwork_id: string    // DB UUID (falls back to slug only for static dev data without Supabase)
   artwork_slug: string
   artwork_title: string
   artwork_thumbnail: string | null

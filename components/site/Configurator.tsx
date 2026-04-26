@@ -177,7 +177,7 @@ export function Configurator({ artwork, tiers }: Props) {
     if (!isReady || !price || !config.material || !config.size || !framing) return
 
     addItem({
-      artwork_id: artwork.slug, // slug used as ID; replaced with UUID in Phase 4
+      artwork_id: artwork.id ?? artwork.slug,
       artwork_slug: artwork.slug,
       artwork_title: artwork.title,
       artwork_thumbnail: artwork.thumbnailImage,
@@ -371,7 +371,7 @@ export function Configurator({ artwork, tiers }: Props) {
 
         {config.framingCategory === 'premium' && (
           <div>
-            <p className="text-xs text-ink-muted mb-3">Frame colour — +$55 AUD</p>
+            <p className="text-xs text-ink-muted mb-3">Frame colour (premium finish)</p>
             <div className="flex flex-wrap gap-2">
               {PREMIUM_COLOURS.map(({ key: swatchKey, ...rest }) => (
                 <ColourSwatch

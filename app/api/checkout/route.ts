@@ -240,7 +240,9 @@ export async function POST(request: NextRequest) {
       stripeCouponId = coupon.id
     }
 
-    const session = await stripe.checkout.sessions.create({
+    let session: Awaited<ReturnType<typeof stripe.checkout.sessions.create>>
+    try {
+      session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
       currency: 'aud',
@@ -284,6 +286,18 @@ export async function POST(request: NextRequest) {
       success_url: `${SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${SITE_URL}/cart`,
     })
+    } catch (stripeErr) {
+      // Stripe session failed — delete the pending DB order so it doesn't accumulate as an orphan
+      if (orderInDb && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        try {
+          const supabase = createAdminClient()
+          await supabase.from('orders').delete().eq('id', orderId)
+        } catch (cleanupErr) {
+          console.warn('[checkout] Could not clean up orphaned order:', cleanupErr)
+        }
+      }
+      throw stripeErr
+    }
 
     // ── 7. Save Stripe session ID ─────────────────────────────────────────────
     if (orderInDb && session.id && process.env.NEXT_PUBLIC_SUPABASE_URL) {

@@ -21,7 +21,10 @@ export default async function NotificationsPage() {
         <h1 className="font-display text-4xl italic text-ink">Notifications</h1>
         <p className="text-sm text-ink-muted mt-2">Where order emails and alerts are sent.</p>
       </div>
-      <NotificationsClient adminEmail={adminEmail} printerEmail={printerEmail} />
+      <NotificationsClient
+        adminEmail={adminEmail}
+        printerEmail={printerEmail}
+      />
     </div>
   )
 }

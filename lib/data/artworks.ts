@@ -7,6 +7,8 @@
  */
 
 export interface ArtworkData {
+  /** DB UUID — populated when loaded from Supabase; undefined for static fallback data */
+  id?: string
   slug: string
   title: string
   year: number
