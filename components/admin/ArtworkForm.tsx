@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/ImageUpload'
-import { saveArtwork, deleteArtwork } from '@/app/admin/actions'
+import { saveArtwork, archiveArtwork } from '@/app/admin/actions'
 
 interface ArtworkData {
   id?: string
@@ -104,13 +104,13 @@ export function ArtworkForm({ artwork }: Props) {
     })
   }
 
-  function handleDelete() {
+  function handleArchive() {
     startTransition(async () => {
       try {
-        await deleteArtwork(artwork!.id!)
+        await archiveArtwork(artwork!.id!)
         router.push('/admin/artworks')
       } catch (e: any) {
-        setError(e.message ?? 'Could not delete.')
+        setError(e.message ?? 'Could not archive.')
       }
     })
   }
@@ -325,7 +325,7 @@ export function ArtworkForm({ artwork }: Props) {
           </div>
         </div>
 
-        {/* Delete */}
+        {/* Archive */}
         {isEditing && (
           <div className="pt-4">
             {!showDeleteConfirm ? (
@@ -333,20 +333,25 @@ export function ArtworkForm({ artwork }: Props) {
                 onClick={() => setShowDeleteConfirm(true)}
                 className="text-xs text-ink-muted hover:text-terracotta transition-colors"
               >
-                Delete this work
+                Archive this work
               </button>
             ) : (
               <div className="border border-terracotta/30 bg-terracotta/5 p-4">
-                <p className="text-sm text-ink mb-3">
-                  Are you sure? This will permanently delete <strong>{form.title}</strong> and cannot be undone.
+                <p className="text-sm text-ink mb-1">
+                  Archive <strong>{form.title}</strong>?
+                </p>
+                <p className="text-xs text-ink-muted mb-3">
+                  This will unpublish the work and hide it from the store. It won&apos;t be deleted —
+                  you can re-publish it from the works list at any time.
                 </p>
                 <div className="flex gap-3">
                   <button
-                    onClick={handleDelete}
+                    onClick={handleArchive}
                     disabled={isPending}
-                    className="border border-terracotta bg-terracotta/10 text-ink px-4 py-2 text-sm hover:bg-terracotta hover:text-bone transition-colors"
+                    className="border border-terracotta bg-terracotta/10 text-ink px-4 py-2 text-sm hover:bg-terracotta hover:text-bone transition-colors disabled:opacity-60 flex items-center gap-2"
                   >
-                    Yes, delete permanently
+                    {isPending && <Loader2 size={12} className="animate-spin" />}
+                    Yes, archive it
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(false)}

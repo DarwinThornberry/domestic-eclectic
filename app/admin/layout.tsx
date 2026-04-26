@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { AdminShell } from '@/components/admin/AdminShell'
 
 export const metadata = { title: { default: 'Studio — Domestic Eclectic', template: '%s — Studio' } }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  // If Supabase isn't wired up yet, render the shell with a placeholder user
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return (
       <AdminShell userInitials="LS" userName="Lara Stoco">
@@ -19,7 +19,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!user) redirect('/login')
 
-  // Verify the user is an active admin
   const { data: admin } = await supabase
     .from('admins')
     .select('email, is_active')
@@ -38,8 +37,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .map((p: string) => p[0]?.toUpperCase() ?? '')
     .join('')
 
+  // Fetch unread message count for the nav badge
+  let unreadMessages = 0
+  try {
+    const adminClient = createAdminClient()
+    const { count } = await adminClient
+      .from('contact_messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_read', false)
+    unreadMessages = count ?? 0
+  } catch {
+    // contact_messages table may not exist yet — badge just won't show
+  }
+
   return (
-    <AdminShell userInitials={initials || 'LS'} userName={email}>
+    <AdminShell
+      userInitials={initials || 'LS'}
+      userName={email}
+      unreadMessages={unreadMessages}
+    >
       {children}
     </AdminShell>
   )

@@ -19,7 +19,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') })
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const BUCKET = 'artworks-public'
+const BUCKET = 'artwork-public'
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error('ERROR: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env.local')
@@ -230,6 +230,8 @@ async function seed() {
     }
 
     // ── Upsert artwork row ─────────────────────────────────────────────────
+    // blur_color and gallery_image_urls are added by migration 002 — omit them
+    // here if the column doesn't exist yet so the seed works before migrations run.
     const { error: upsertError } = await supabase
       .from('artworks')
       .upsert(
@@ -241,12 +243,10 @@ async function seed() {
           description: artwork.description,
           original_dims: artwork.original_dims,
           thumbnail_url: publicUrl,
-          gallery_image_urls: [],
           gallery_images: [],
           is_published: true,
           sort_order: artwork.sort_order,
           aspect_ratio: aspectRatio,
-          blur_color: artwork.blur_color,
         },
         { onConflict: 'slug' },
       )

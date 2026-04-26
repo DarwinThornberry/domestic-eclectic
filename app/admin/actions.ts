@@ -122,12 +122,15 @@ export async function saveArtwork(
   revalidatePath('/works')
 }
 
-export async function deleteArtwork(artworkId: string) {
+export async function archiveArtwork(artworkId: string) {
   const supabase = createAdminClient()
-  const { error } = await supabase.from('artworks').delete().eq('id', artworkId)
+  const { error } = await supabase
+    .from('artworks')
+    .update({ is_published: false, updated_at: new Date().toISOString() })
+    .eq('id', artworkId)
   if (error) throw new Error(error.message)
   revalidatePath('/admin/artworks')
-  revalidatePath('/works')
+  revalidatePath('/works', 'layout')
 }
 
 export async function reorderArtworks(orderedIds: string[]) {
@@ -178,6 +181,18 @@ export async function saveArtworkPricing(
   if (error) throw new Error(error.message)
   revalidatePath(`/admin/artworks/${artworkId}/edit`)
   revalidatePath('/admin/settings/pricing/strategy')
+}
+
+// ─── Contact messages ─────────────────────────────────────────────────────────
+
+export async function markMessageRead(messageId: string, isRead: boolean) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('contact_messages')
+    .update({ is_read: isRead })
+    .eq('id', messageId)
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/messages')
 }
 
 // ─── Discounts ────────────────────────────────────────────────────────────────
