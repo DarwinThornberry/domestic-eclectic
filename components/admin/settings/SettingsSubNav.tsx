@@ -19,7 +19,7 @@ const SECTIONS = [
       { href: '/admin/settings/notifications',    label: 'Notifications' },
       { href: '/admin/settings/studio',           label: 'Studio Profile' },
       { href: '/admin/settings/account',          label: 'Account' },
-      { href: '/admin/settings/launch-signups',   label: 'Launch Signups' },
+      { href: '/admin/settings/launch-signups',   label: 'Email Signups' },
     ],
   },
 ]

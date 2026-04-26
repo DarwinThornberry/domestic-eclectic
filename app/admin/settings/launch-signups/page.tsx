@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import { LaunchSignupsClient } from '@/components/admin/settings/LaunchSignupsClient'
 
-export const metadata = { title: 'Launch Signups' }
+export const metadata = { title: 'Email Signups' }
 
 export default async function LaunchSignupsPage() {
   let signups: { id: string; email: string; source: string | null; created_at: string }[] = []
@@ -21,9 +21,9 @@ export default async function LaunchSignupsPage() {
     <div className="px-6 lg:px-10 py-10 max-w-2xl">
       <div className="mb-8">
         <p className="caption text-terracotta tracking-[0.16em] mb-2">SETTINGS</p>
-        <h1 className="font-display text-4xl italic text-ink">Launch Signups</h1>
+        <h1 className="font-display text-4xl italic text-ink">Email Signups</h1>
         <p className="text-sm text-ink-muted mt-2">
-          Emails collected before the store went live.
+          Pre-launch cart signups and Studio Notes subscribers from the footer.
         </p>
       </div>
 
