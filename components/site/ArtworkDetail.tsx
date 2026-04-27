@@ -31,7 +31,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
           {/* Left: artwork image */}
           <div>
             <button
-              className="group relative w-full overflow-hidden border border-border focus:outline-none focus-visible:ring-1 focus-visible:ring-terracotta"
+              className="group relative w-full overflow-hidden border border-border bg-white focus:outline-none focus-visible:ring-1 focus-visible:ring-terracotta"
               style={{
                 aspectRatio: String(artwork.aspectRatio),
                 boxShadow: '0 8px 40px rgba(26,24,20,0.08)',
@@ -79,7 +79,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
                 {artwork.galleryImages.map((img, i) => (
                   <div
                     key={i}
-                    className="relative shrink-0 w-20 h-20 border border-border overflow-hidden cursor-pointer hover:border-ink transition-colors"
+                    className="relative shrink-0 w-20 h-20 border border-border overflow-hidden bg-white cursor-pointer hover:border-ink transition-colors"
                   >
                     <Image
                       src={img}

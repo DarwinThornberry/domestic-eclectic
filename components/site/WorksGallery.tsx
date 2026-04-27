@@ -87,7 +87,7 @@ export function WorksGallery({ artworks }: Props) {
               >
                 {/* Image container — hairline border + subtle shadow */}
                 <div
-                  className={`relative overflow-hidden mb-5 border border-border ${aspectClass}`}
+                  className={`relative overflow-hidden mb-5 border border-border bg-white ${aspectClass}`}
                   style={{ boxShadow: '0 4px 20px rgba(26,24,20,0.05)' }}
                 >
                   <ArtworkImage

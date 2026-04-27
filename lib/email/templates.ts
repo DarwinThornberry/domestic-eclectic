@@ -2,7 +2,7 @@ import type { OrderWithItems } from '@/types'
 
 // Shared email styles — inline for maximum email client compatibility
 const styles = {
-  body: 'font-family: Georgia, "Times New Roman", serif; background-color: #F5F1EA; margin: 0; padding: 0; color: #1A1814;',
+  body: 'font-family: Georgia, "Times New Roman", serif; background-color: #F2EBD9; margin: 0; padding: 0; color: #1A1814;',
   wrap: 'max-width: 560px; margin: 0 auto; padding: 40px 24px;',
   wordmarkTop: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9px; letter-spacing: 4px; color: #4A4540; text-transform: uppercase; margin: 0 0 2px;',
   wordmarkBottom: 'font-family: Georgia, serif; font-size: 20px; font-style: italic; color: #1A1814; margin: 0 0 32px;',
@@ -16,7 +16,7 @@ const styles = {
   address: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: #1A1814; line-height: 1.8;',
   totalRow: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 4px 0;',
   totalFinal: 'font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; padding: 10px 0 0; border-top: 1px solid #E5DFD5; margin-top: 4px;',
-  btn: 'display: inline-block; background: #1A1814; color: #F5F1EA; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; padding: 14px 28px; margin-top: 24px;',
+  btn: 'display: inline-block; background: #1A1814; color: #F2EBD9; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; padding: 14px 28px; margin-top: 24px;',
   footer: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11px; color: #4A4540; border-top: 1px solid #E5DFD5; margin-top: 40px; padding-top: 20px; line-height: 1.7;',
 }
 

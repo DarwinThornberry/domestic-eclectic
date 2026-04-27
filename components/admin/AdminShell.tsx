@@ -55,7 +55,7 @@ export function AdminShell({ children, userInitials, userName, unreadMessages = 
   }
 
   return (
-    <div className="flex flex-col h-screen bg-bone">
+    <div className="flex flex-col h-screen bg-bone" style={{ '--color-bone': '#F5F1EA', '--color-bone-dark': '#EDE8DF' } as React.CSSProperties}>
       {/* ── Top bar ──────────────────────────────────────────────────────────── */}
       <header className="shrink-0 h-14 flex items-center justify-between px-5 lg:px-8 bg-bone border-b border-border z-10">
         <div className="flex items-center gap-0 leading-none">

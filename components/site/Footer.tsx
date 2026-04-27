@@ -77,7 +77,7 @@ export function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div>
+          <div className="border border-border-dark p-6">
             <p className="caption text-ink mb-3">Studio Notes</p>
             <p className="text-xs text-ink-muted mb-4 leading-relaxed">
               Occasional updates from the studio — new works, process notes,

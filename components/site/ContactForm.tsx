@@ -67,7 +67,7 @@ export function ContactForm() {
           required
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
-          className="border border-border bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors"
+          className="border border-border-dark bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors"
           placeholder="Full name"
         />
       </div>
@@ -82,7 +82,7 @@ export function ContactForm() {
           required
           value={form.email}
           onChange={(e) => set('email', e.target.value)}
-          className="border border-border bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors"
+          className="border border-border-dark bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors"
           placeholder="you@example.com"
         />
       </div>
@@ -97,7 +97,7 @@ export function ContactForm() {
           rows={6}
           value={form.message}
           onChange={(e) => set('message', e.target.value)}
-          className="border border-border bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors resize-none"
+          className="border border-border-dark bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors resize-none"
           placeholder="Your message…"
         />
       </div>

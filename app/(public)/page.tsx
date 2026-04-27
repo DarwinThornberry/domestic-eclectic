@@ -44,7 +44,7 @@ export default async function HomePage() {
 
           {/* Contained artwork — hairline border + subtle shadow */}
           <div
-            className="relative w-full overflow-hidden border border-border"
+            className="relative w-full overflow-hidden border border-border bg-white"
             style={{
               height: 'clamp(320px, 70vh, 820px)',
               boxShadow: '0 8px 48px rgba(26, 24, 20, 0.07)',
@@ -87,6 +87,7 @@ export default async function HomePage() {
               View Work <ArrowRight size={13} />
             </Link>
           </div>
+
         </div>
       </section>
 
@@ -163,7 +164,7 @@ export default async function HomePage() {
 
             {/* Artwork — contained with hairline border + shadow */}
             <div
-              className="relative aspect-[4/3] overflow-hidden border border-border"
+              className="relative aspect-[4/3] overflow-hidden border border-border bg-white"
               style={{ boxShadow: '0 6px 32px rgba(26,24,20,0.06)' }}
             >
               <ArtworkImage
@@ -227,7 +228,7 @@ function WorkThumb({
 }) {
   return (
     <div
-      className={`relative overflow-hidden border border-border ${aspectClass}`}
+      className={`relative overflow-hidden border border-border bg-white ${aspectClass}`}
       style={{ boxShadow: '0 4px 20px rgba(26,24,20,0.05)' }}
     >
       <ArtworkImage
