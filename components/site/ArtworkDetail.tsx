@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ZoomIn } from 'lucide-react'
 import { Lightbox } from '@/components/ui/Lightbox'
+import { ArtworkMonogram } from '@/components/ui/ArtworkMonogram'
 import { Configurator } from '@/components/site/Configurator'
 import type { ArtworkData } from '@/lib/data/artworks'
 import type { PricingTiers } from '@/lib/pricing/southern-buoy'
@@ -39,14 +40,19 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
               aria-label="Click to zoom"
             >
               {artwork.heroImage ? (
-                <Image
-                  src={artwork.heroImage}
-                  alt={artwork.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  className="object-cover"
-                  priority
-                />
+                <div className="absolute inset-0">
+                  <Image
+                    src={artwork.heroImage}
+                    alt={artwork.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover select-none artwork-img"
+                    priority
+                    onContextMenu={(e) => e.preventDefault()}
+                    draggable={false}
+                  />
+                  <ArtworkMonogram />
+                </div>
               ) : (
                 <div
                   className="absolute inset-0 flex items-center justify-center"
@@ -80,7 +86,9 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
                       alt={`${artwork.title} detail ${i + 1}`}
                       fill
                       sizes="80px"
-                      className="object-cover"
+                      className="object-cover select-none artwork-img"
+                      onContextMenu={(e) => e.preventDefault()}
+                      draggable={false}
                     />
                   </div>
                 ))}

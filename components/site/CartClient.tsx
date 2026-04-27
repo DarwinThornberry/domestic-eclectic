@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart'
 import { calculateShipping, formatPrice } from '@/lib/pricing/southern-buoy'
 import { MATERIAL_LABELS, FRAMING_LABELS, SIZE_LABELS } from '@/lib/constants'
 import { LaunchSignupBlock } from '@/components/site/LaunchSignupBlock'
+import { ArtworkMonogram } from '@/components/ui/ArtworkMonogram'
 
 const COUNTRIES = [
   { code: 'AU', label: 'Australia' },
@@ -178,13 +179,18 @@ export function CartClient({ storeLive }: Props) {
                     style={{ boxShadow: '0 2px 10px rgba(26,24,20,0.06)' }}
                   >
                     {item.artwork_thumbnail ? (
-                      <Image
-                        src={item.artwork_thumbnail}
-                        alt={item.artwork_title}
-                        fill
-                        sizes="96px"
-                        className="object-cover"
-                      />
+                      <div className="absolute inset-0">
+                        <Image
+                          src={item.artwork_thumbnail}
+                          alt={item.artwork_title}
+                          fill
+                          sizes="96px"
+                          className="object-cover select-none artwork-img"
+                          onContextMenu={(e) => e.preventDefault()}
+                          draggable={false}
+                        />
+                        <ArtworkMonogram />
+                      </div>
                     ) : (
                       <div className="absolute inset-0 bg-bone-dark flex items-center justify-center">
                         <span className="font-display text-2xl italic text-ink/20 select-none">

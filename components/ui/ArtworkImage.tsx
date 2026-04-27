@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { ArtworkMonogram } from './ArtworkMonogram'
 
 interface ArtworkImageProps {
   src: string | null | undefined
@@ -13,16 +14,6 @@ interface ArtworkImageProps {
   blurColor?: string
 }
 
-/**
- * Wrapper around next/image for artwork images.
- *
- * Always used inside a `relative`-positioned container with explicit dimensions
- * (via aspect-ratio or fixed height) — it fills that container with object-cover.
- *
- * Falls back gracefully to a coloured placeholder when the image file hasn't
- * been added yet. Drop the real file into /public/artworks/web/ and the
- * placeholder disappears automatically.
- */
 export function ArtworkImage({
   src,
   alt,
@@ -50,15 +41,22 @@ export function ArtworkImage({
     )
   }
 
+  // Wrapper div fills the caller's relative container and acts as an explicit
+  // stacking root so ArtworkMonogram is reliably positioned on top of the image.
   return (
-    <Image
-      src={src}
-      alt={alt}
-      fill
-      sizes={sizes}
-      priority={priority}
-      className={`object-cover ${className}`}
-      onError={() => setHasError(true)}
-    />
+    <div className="absolute inset-0">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className={`object-cover select-none artwork-img ${className}`}
+        onError={() => setHasError(true)}
+        onContextMenu={(e) => e.preventDefault()}
+        draggable={false}
+      />
+      <ArtworkMonogram />
+    </div>
   )
 }

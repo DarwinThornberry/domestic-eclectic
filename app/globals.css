@@ -102,6 +102,12 @@ img {
   color: #4A4540;
 }
 
+/* ─── Artwork Image Protection ───────────────────────────────────────────────── */
+
+.artwork-img {
+  -webkit-user-drag: none;
+}
+
 /* ─── Animations ─────────────────────────────────────────────────────────────── */
 
 @keyframes fade-up {

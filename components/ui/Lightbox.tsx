@@ -3,6 +3,7 @@
 import { useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { X } from 'lucide-react'
+import { ArtworkMonogram } from './ArtworkMonogram'
 
 interface LightboxProps {
   src: string
@@ -49,14 +50,19 @@ export function Lightbox({ src, alt, onClose }: LightboxProps) {
         style={{ aspectRatio: 'auto' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-contain"
-          sizes="(max-width: 768px) 95vw, 80vw"
-          priority
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            className="object-contain select-none artwork-img"
+            sizes="(max-width: 768px) 95vw, 80vw"
+            priority
+            onContextMenu={(e) => e.preventDefault()}
+            draggable={false}
+          />
+          <ArtworkMonogram />
+        </div>
       </div>
     </div>
   )
