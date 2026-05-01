@@ -32,14 +32,14 @@ export function Lightbox({ src, alt, onClose }: LightboxProps) {
   return (
     // Backdrop — click outside to close
     <div
-      className="fixed inset-0 z-[100] bg-ink/90 flex items-center justify-center p-4 md:p-8"
+      className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 md:p-8"
       onClick={onClose}
     >
       {/* Close button */}
       <button
         onClick={onClose}
         aria-label="Close"
-        className="absolute top-5 right-5 text-bone/70 hover:text-bone transition-colors"
+        className="absolute top-5 right-5 text-white/70 hover:text-white transition-colors"
       >
         <X size={24} strokeWidth={1.5} />
       </button>

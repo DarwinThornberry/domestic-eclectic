@@ -175,8 +175,8 @@ export function CartClient({ storeLive }: Props) {
                 >
                   {/* Thumbnail */}
                   <div
-                    className="relative shrink-0 w-20 h-20 sm:w-24 sm:h-24 border border-border overflow-hidden"
-                    style={{ boxShadow: '0 2px 10px rgba(26,24,20,0.06)' }}
+                    className="relative shrink-0 w-20 h-20 sm:w-24 sm:h-24 border border-border overflow-hidden bg-canvas"
+                    style={{ boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)' }}
                   >
                     {item.artwork_thumbnail ? (
                       <div className="absolute inset-0">

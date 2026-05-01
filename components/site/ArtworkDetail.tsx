@@ -31,10 +31,10 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
           {/* Left: artwork image */}
           <div>
             <button
-              className="group relative w-full overflow-hidden border border-border bg-white focus:outline-none focus-visible:ring-1 focus-visible:ring-terracotta"
+              className="group relative w-full overflow-hidden border border-border bg-canvas focus:outline-none focus-visible:ring-1 focus-visible:ring-terracotta"
               style={{
                 aspectRatio: String(artwork.aspectRatio),
-                boxShadow: '0 8px 40px rgba(26,24,20,0.08)',
+                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.35)',
               }}
               onClick={() => artwork.heroImage && setLightboxOpen(true)}
               aria-label="Click to zoom"
@@ -65,10 +65,10 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
               )}
 
               {artwork.heroImage && (
-                <div className="absolute inset-0 flex items-center justify-center bg-ink/0 group-hover:bg-ink/10 transition-colors duration-300">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-bone/90 px-4 py-2 flex items-center gap-2">
-                    <ZoomIn size={14} className="text-ink" />
-                    <span className="caption text-ink text-[11px]">CLICK TO ZOOM</span>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors duration-300">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-canvas/90 px-4 py-2 flex items-center gap-2">
+                    <ZoomIn size={14} style={{ color: '#1A1814' }} />
+                    <span className="caption text-[11px]" style={{ color: '#1A1814' }}>CLICK TO ZOOM</span>
                   </div>
                 </div>
               )}
@@ -79,7 +79,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
                 {artwork.galleryImages.map((img, i) => (
                   <div
                     key={i}
-                    className="relative shrink-0 w-20 h-20 border border-border overflow-hidden bg-white cursor-pointer hover:border-ink transition-colors"
+                    className="relative shrink-0 w-20 h-20 border border-border overflow-hidden bg-canvas cursor-pointer hover:border-ink transition-colors"
                   >
                     <Image
                       src={img}

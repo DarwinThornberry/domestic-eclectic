@@ -44,10 +44,10 @@ export default async function HomePage() {
 
           {/* Contained artwork — hairline border + subtle shadow */}
           <div
-            className="relative w-full overflow-hidden border border-border bg-white"
+            className="relative w-full overflow-hidden border border-border bg-canvas"
             style={{
               height: 'clamp(320px, 70vh, 820px)',
-              boxShadow: '0 8px 48px rgba(26, 24, 20, 0.07)',
+              boxShadow: '0 8px 48px rgba(0, 0, 0, 0.30)',
             }}
           >
             <ArtworkImage
@@ -164,8 +164,8 @@ export default async function HomePage() {
 
             {/* Artwork — contained with hairline border + shadow */}
             <div
-              className="relative aspect-[4/3] overflow-hidden border border-border bg-white"
-              style={{ boxShadow: '0 6px 32px rgba(26,24,20,0.06)' }}
+              className="relative aspect-[4/3] overflow-hidden border border-border bg-canvas"
+              style={{ boxShadow: '0 6px 32px rgba(0, 0, 0, 0.25)' }}
             >
               <ArtworkImage
                 src={studioArtwork.heroImage}
@@ -228,8 +228,8 @@ function WorkThumb({
 }) {
   return (
     <div
-      className={`relative overflow-hidden border border-border bg-white ${aspectClass}`}
-      style={{ boxShadow: '0 4px 20px rgba(26,24,20,0.05)' }}
+      className={`relative overflow-hidden border border-border bg-canvas ${aspectClass}`}
+      style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.20)' }}
     >
       <ArtworkImage
         src={artwork.heroImage}
@@ -239,10 +239,10 @@ function WorkThumb({
         className="transition-transform duration-700 group-hover:scale-[1.025]"
       />
       {/* Hover overlay — title + year fade in */}
-      <div className="absolute inset-0 bg-ink/0 group-hover:bg-ink/30 transition-colors duration-300 flex flex-col justify-end p-5">
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex flex-col justify-end p-5">
         <div className="translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <p className="font-display text-xl italic text-bone leading-tight">{artwork.title}</p>
-          <p className="caption text-bone/65 mt-1">{artwork.year}</p>
+          <p className="font-display text-xl italic text-[#F2EBD9] leading-tight">{artwork.title}</p>
+          <p className="caption text-[#F2EBD9]/65 mt-1">{artwork.year}</p>
         </div>
       </div>
     </div>
