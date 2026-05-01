@@ -266,7 +266,7 @@ export function CartClient({ storeLive }: Props) {
                   id="country"
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
-                  className="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
+                  className="w-full border border-ink/[0.35] bg-ink/[0.08] px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink transition-all"
                 >
                   {COUNTRIES.map((c) => (
                     <option key={c.code} value={c.code}>{c.label}</option>
@@ -332,7 +332,7 @@ export function CartClient({ storeLive }: Props) {
                               onChange={(e) => { setDiscountCode(e.target.value.toUpperCase()); setDiscountError(null) }}
                               onKeyDown={(e) => e.key === 'Enter' && handleApplyCode()}
                               placeholder="DISCOUNT CODE"
-                              className="flex-1 border border-border bg-transparent px-3 py-2 text-sm text-ink uppercase tracking-wide focus:outline-none focus:border-ink transition-colors"
+                              className="flex-1 border border-ink/[0.35] bg-ink/[0.08] px-3 py-2 text-sm text-ink uppercase tracking-wide placeholder:text-ink/50 focus:outline-none focus:border-ink transition-all"
                             />
                             <button
                               onClick={handleApplyCode}

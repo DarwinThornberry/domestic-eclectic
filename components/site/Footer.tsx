@@ -18,7 +18,7 @@ export function Footer() {
               <p className="wordmark-eclectic text-ink">Eclectic</p>
             </div>
             <p className="caption text-ink-muted">by Lara Stocco</p>
-            <p className="text-sm text-ink-muted leading-relaxed mt-2">
+            <p className="text-sm text-ink leading-relaxed mt-2">
               Fine art prints of original mixed-media collages,
               printed on archival materials in Mornington, Victoria.
             </p>
@@ -30,7 +30,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Domestic Eclectic on Instagram"
-                className="text-ink-muted hover:text-ink transition-colors"
+                className="text-ink hover:text-terracotta transition-colors"
               >
                 {/* Instagram icon — inline SVG, lucide-react doesn't include it */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -44,7 +44,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Domestic Eclectic on Facebook"
-                className="text-ink-muted hover:text-ink transition-colors"
+                className="text-ink hover:text-terracotta transition-colors"
               >
                 {/* Facebook icon — inline SVG, lucide-react doesn't include it */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -67,7 +67,7 @@ export function Footer() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm text-ink-muted hover:text-ink transition-colors"
+                    className="text-sm text-ink hover:text-terracotta transition-colors"
                   >
                     {label}
                   </Link>
@@ -79,7 +79,7 @@ export function Footer() {
           {/* Newsletter */}
           <div className="border border-border-dark p-6">
             <p className="caption text-ink mb-3">Studio Notes</p>
-            <p className="text-xs text-ink-muted mb-4 leading-relaxed">
+            <p className="text-xs text-ink mb-4 leading-relaxed">
               Occasional updates from the studio — new works, process notes,
               and what&apos;s on the bench.
             </p>
@@ -89,7 +89,7 @@ export function Footer() {
 
         {/* Acknowledgement of Country — [PLACEHOLDER] Lara to review wording */}
         <div className="border-t border-border py-8">
-          <p className="text-xs text-ink-muted leading-relaxed max-w-2xl">
+          <p className="text-xs text-ink leading-relaxed max-w-2xl">
             Domestic Eclectic acknowledges the Traditional Custodians of the lands
             on which we live and create. We pay our respects to Elders past and present.
           </p>
@@ -97,17 +97,17 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-border py-5 flex flex-col md:flex-row justify-between gap-3">
-          <p className="text-xs text-ink-muted">
+          <p className="text-xs text-ink">
             © {year} Lara Stocco · Domestic Eclectic. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
-            <p className="text-xs text-ink-muted">
+            <p className="text-xs text-ink">
               Fulfilled by{' '}
               <a
                 href="https://www.southernbuoy.com.au"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-ink transition-colors"
+                className="hover:text-terracotta transition-colors"
               >
                 Southern Buoy
               </a>

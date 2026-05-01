@@ -67,7 +67,7 @@ export function ContactForm() {
           required
           value={form.name}
           onChange={(e) => set('name', e.target.value)}
-          className="border border-border-dark bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors"
+          className="border border-ink/[0.35] bg-ink/[0.08] px-4 py-3 text-ink placeholder:text-ink/50 focus:outline-none focus:border-ink focus:shadow-[0_0_0_1px_rgba(242,235,217,0.15)] transition-all"
           placeholder="Full name"
         />
       </div>
@@ -82,7 +82,7 @@ export function ContactForm() {
           required
           value={form.email}
           onChange={(e) => set('email', e.target.value)}
-          className="border border-border-dark bg-transparent px-4 py-3 text-ink placeholder:text-ink-muted/40 focus:outline-none focus:border-terracotta transition-colors"
+          className="border border-ink/[0.35] bg-ink/[0.08] px-4 py-3 text-ink placeholder:text-ink/50 focus:outline-none focus:border-ink focus:shadow-[0_0_0_1px_rgba(242,235,217,0.15)] transition-all"
           placeholder="you@example.com"
         />
       </div>

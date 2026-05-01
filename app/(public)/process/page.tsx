@@ -58,7 +58,7 @@ export default function ProcessPage() {
               </p>
               <div>
                 <h2 className="font-display text-xl italic text-ink mb-3">{title}</h2>
-                <p className="text-ink-muted leading-relaxed">{body}</p>
+                <p className="text-ink leading-relaxed">{body}</p>
               </div>
             </div>
           ))}
@@ -100,7 +100,7 @@ export default function ProcessPage() {
                   <h3 className="font-display text-lg italic text-ink">{name}</h3>
                   <span className="caption text-ink-muted">{subtitle}</span>
                 </div>
-                <p className="text-sm text-ink-muted leading-relaxed">{description}</p>
+                <p className="text-sm text-ink leading-relaxed">{description}</p>
               </div>
             ))}
           </div>

@@ -224,7 +224,7 @@ export function Configurator({ artwork, tiers }: Props) {
                 onClick={() => handleMaterialChange(m.key)}
                 className={`text-left p-4 border transition-all ${
                   selected
-                    ? 'border-ink bg-ink/[0.03]'
+                    ? 'border-ink bg-ink/[0.07]'
                     : 'border-border hover:border-ink-muted'
                 }`}
               >
@@ -257,8 +257,8 @@ export function Configurator({ artwork, tiers }: Props) {
             disabled={!config.material}
             className={`w-full flex items-center justify-between border px-4 py-3 text-sm transition-colors ${
               config.material
-                ? 'border-border hover:border-ink-muted cursor-pointer'
-                : 'border-border opacity-40 cursor-not-allowed'
+                ? 'border-ink/[0.35] bg-ink/[0.08] hover:border-ink/60 cursor-pointer'
+                : 'border-ink/[0.25] bg-ink/[0.04] opacity-40 cursor-not-allowed'
             }`}
           >
             <span className={selectedSizeLabel ? 'text-ink' : 'text-ink-muted'}>
@@ -271,7 +271,7 @@ export function Configurator({ artwork, tiers }: Props) {
           </button>
 
           {sizeOpen && (
-            <div className="absolute top-full left-0 right-0 z-30 bg-bone border border-border border-t-0 max-h-72 overflow-y-auto shadow-lg">
+            <div className="absolute top-full left-0 right-0 z-30 bg-bone-dark border border-ink/[0.35] border-t-0 max-h-72 overflow-y-auto shadow-lg">
               {(['standard', 'square', 'rectangular'] as const).map((group) => {
                 const opts = SIZE_GROUPS[group].filter(
                   (s) =>
@@ -282,7 +282,7 @@ export function Configurator({ artwork, tiers }: Props) {
                 if (!opts.length) return null
                 return (
                   <div key={group}>
-                    <p className="caption text-ink-muted px-4 py-2 bg-bone-dark text-[10px] tracking-[0.12em]">
+                    <p className="caption text-ink px-4 py-2 bg-bone text-[10px] tracking-[0.12em]">
                       {group === 'standard' ? 'A-SERIES' : group === 'square' ? 'SQUARE' : 'RECTANGULAR'}
                     </p>
                     {opts.map((size) => {

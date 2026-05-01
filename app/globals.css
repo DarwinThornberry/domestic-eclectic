@@ -7,10 +7,10 @@
   --color-bone:        #67582F;   /* primary background */
   --color-bone-dark:   #5A4D29;   /* elevated surfaces (dropdowns, cards) */
   --color-ink:         #F2EBD9;   /* primary text */
-  --color-ink-muted:   #C8BA9A;   /* secondary text / captions */
+  --color-ink-muted:   #C9C0A8;   /* secondary text — timestamps, metadata */
   --color-terracotta:  #C49A6C;   /* warm gold accent */
   --color-olive:       #98C258;   /* success / positive states */
-  --color-border:      rgba(242, 235, 217, 0.22);   /* hairline borders */
+  --color-border:      rgba(242, 235, 217, 0.25);   /* hairline borders / dividers */
   --color-border-dark: rgba(242, 235, 217, 0.45);   /* form-field borders */
   --color-canvas:      #FAF6EC;   /* artwork container bg — cream frame */
 

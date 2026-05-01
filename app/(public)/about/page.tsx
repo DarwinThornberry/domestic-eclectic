@@ -25,7 +25,7 @@ export default function AboutPage() {
             Lara Stocco
           </h1>
 
-          <div className="flex flex-col gap-5 text-ink-muted leading-relaxed">
+          <div className="flex flex-col gap-5 text-ink leading-relaxed">
             <p>
               Lara Stocco is a Melbourne-based mixed-media artist whose work draws
               from the deep archives of art history — Botticelli&apos;s gilded

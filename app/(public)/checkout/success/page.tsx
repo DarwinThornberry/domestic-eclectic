@@ -47,7 +47,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
           </p>
         )}
 
-        <div className="flex flex-col gap-5 text-ink-muted leading-relaxed mb-10">
+        <div className="flex flex-col gap-5 text-ink leading-relaxed mb-10">
           <p>
             A confirmation email is on its way to you with your order summary.
           </p>

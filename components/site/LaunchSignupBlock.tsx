@@ -55,7 +55,7 @@ export function LaunchSignupBlock({ source = 'cart' }: Props) {
               onChange={(e) => { setEmail(e.target.value); setError(null) }}
               placeholder="your@email.com"
               required
-              className="flex-1 border border-border bg-transparent px-4 py-3 text-sm text-ink placeholder:text-ink-muted/50 focus:outline-none focus:border-ink transition-colors"
+              className="flex-1 border border-ink/[0.35] bg-ink/[0.08] px-4 py-3 text-sm text-ink placeholder:text-ink/50 focus:outline-none focus:border-ink focus:shadow-[0_0_0_1px_rgba(242,235,217,0.15)] transition-all"
             />
             <button
               type="submit"

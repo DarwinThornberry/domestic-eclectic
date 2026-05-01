@@ -107,7 +107,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
           <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-12">
             <div>
               <p className="caption text-terracotta mb-4 tracking-[0.14em]">ABOUT THIS WORK</p>
-              <p className="text-ink-muted leading-relaxed max-w-xl">{artwork.description}</p>
+              <p className="text-ink leading-relaxed max-w-xl">{artwork.description}</p>
             </div>
             <div className="flex flex-col gap-4 md:border-l md:border-border md:pl-12">
               <div>

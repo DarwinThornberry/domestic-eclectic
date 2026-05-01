@@ -71,7 +71,7 @@ export default async function HomePage() {
             </h1>
 
             {/* Tagline — [PLACEHOLDER] Lara to review */}
-            <p className="text-ink-muted leading-relaxed mb-4">
+            <p className="text-ink leading-relaxed mb-4">
               {featured.tagline}
             </p>
 
@@ -184,7 +184,7 @@ export default async function HomePage() {
               </h2>
 
               {/* [PLACEHOLDER] — Lara to update this text */}
-              <div className="flex flex-col gap-5 text-ink-muted leading-relaxed">
+              <div className="flex flex-col gap-5 text-ink leading-relaxed">
                 <p>
                   Lara Stocco&apos;s practice begins in the archive — art books opened
                   to Botticelli, Vermeer, Frida Kahlo; botanical illustration

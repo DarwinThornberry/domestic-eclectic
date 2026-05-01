@@ -46,12 +46,12 @@ export function NewsletterForm() {
           onChange={(e) => { setEmail(e.target.value); setError(null) }}
           placeholder="your@email.com"
           required
-          className="flex-1 text-sm border border-border bg-transparent px-3 py-2 text-ink placeholder:text-ink-muted/50 focus:outline-none focus:border-terracotta transition-colors"
+          className="flex-1 text-sm border border-ink/[0.35] bg-ink/[0.08] px-3 py-2 text-ink placeholder:text-ink/50 focus:outline-none focus:border-ink transition-all"
         />
         <button
           type="submit"
           disabled={loading || !email.trim()}
-          className="caption text-ink-muted border border-border px-4 py-2 hover:bg-ink hover:text-bone hover:border-ink transition-colors disabled:opacity-60 flex items-center gap-1.5"
+          className="caption text-ink border border-ink/[0.35] px-4 py-2 hover:bg-ink hover:text-bone hover:border-ink transition-colors disabled:opacity-60 flex items-center gap-1.5"
         >
           {loading && <Loader2 size={11} className="animate-spin" />}
           Join
