@@ -90,6 +90,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
                       onContextMenu={(e) => e.preventDefault()}
                       draggable={false}
                     />
+                    <ArtworkMonogram />
                   </div>
                 ))}
               </div>
