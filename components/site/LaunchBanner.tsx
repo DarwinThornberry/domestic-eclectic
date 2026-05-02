@@ -25,7 +25,7 @@ export function LaunchBanner() {
   return (
     <div className="border-b border-border bg-bone">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-2.5 flex items-center justify-center gap-4 relative">
-        <p className="text-xs text-ink-muted text-center">
+        <p className="text-xs text-ink text-center">
           The store is launching soon.{' '}
           <a
             href="/cart"
@@ -37,7 +37,7 @@ export function LaunchBanner() {
         <button
           onClick={dismiss}
           aria-label="Dismiss"
-          className="absolute right-4 lg:right-10 text-ink-muted hover:text-ink transition-colors p-1 touch-manipulation"
+          className="absolute right-4 lg:right-10 text-ink hover:text-terracotta transition-colors p-1 touch-manipulation"
         >
           <X size={13} />
         </button>

@@ -3,15 +3,16 @@
 /* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 
 @theme {
-  /* Palette */
-  --color-bone:        #FAF6EC;
-  --color-bone-dark:   #EDE8DF;
-  --color-ink:         #1A1814;
-  --color-ink-muted:   #4A4540;
-  --color-terracotta:  #9A6B4F;
-  --color-olive:       #5B6B47;
-  --color-border:      #E5DFD5;
-  --color-border-dark: #C8C0B0;
+  /* Palette — dark olive theme */
+  --color-bone:        #67582F;   /* primary background */
+  --color-bone-dark:   #5A4D29;   /* elevated surfaces (dropdowns, cards) */
+  --color-ink:         #F2EBD9;   /* primary text */
+  --color-ink-muted:   #C9C0A8;   /* secondary text — timestamps, metadata */
+  --color-terracotta:  #C49A6C;   /* warm gold accent */
+  --color-olive:       #98C258;   /* success / positive states */
+  --color-border:      rgba(242, 235, 217, 0.25);   /* hairline borders / dividers */
+  --color-border-dark: rgba(242, 235, 217, 0.45);   /* form-field borders */
+  --color-canvas:      #FAF6EC;   /* artwork container bg — cream frame */
 
   /* Typography */
   --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
@@ -35,11 +36,27 @@ html {
 }
 
 body {
-  background-color: #FAF6EC;
-  /* Paper-grain texture — SVG noise filter, no extra HTTP request */
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-  color: #1A1814;
+  background-color: #67582F;
+  /* Canvas/linen weave: cross-hatch threads + organic grain noise on top.
+     AdminShell covers the viewport with its own bg-color so admin never sees this. */
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(242, 235, 217, 0.025) 0px,
+      rgba(242, 235, 217, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(242, 235, 217, 0.025) 0px,
+      rgba(242, 235, 217, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: auto, auto, 200px 200px;
+  color: #F2EBD9;
   font-family: var(--font-body);
   font-size: 0.9375rem; /* 15px */
   line-height: 1.65;
@@ -56,12 +73,12 @@ h1, h2, h3, h4 {
 /* Hairline rules */
 hr {
   border: none;
-  border-top: 1px solid #E5DFD5;
+  border-top: 1px solid var(--color-border);
 }
 
 /* Focus ring — minimal, accessible */
 :focus-visible {
-  outline: 1px solid #9A6B4F;
+  outline: 1px solid var(--color-terracotta);
   outline-offset: 3px;
 }
 
@@ -102,7 +119,7 @@ img {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #4A4540;
+  color: var(--color-ink-muted);
 }
 
 /* ─── Artwork Image Protection ───────────────────────────────────────────────── */
