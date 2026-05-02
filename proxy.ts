@@ -1,20 +1,38 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+const PASS_COOKIE = 'site_pass'
+const PASS_TOKEN  = 'unlocked'
+
 export async function proxy(request: NextRequest) {
-  // If Supabase isn't configured yet, allow everything through (dev convenience)
+  const { pathname } = request.nextUrl
+
+  // ── Site password gate ────────────────────────────────────────────────────
+  const gateExcluded =
+    pathname.startsWith('/enter') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/_next') ||
+    pathname.includes('.')
+
+  if (!gateExcluded && request.cookies.get(PASS_COOKIE)?.value !== PASS_TOKEN) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/enter'
+    return NextResponse.redirect(url)
+  }
+
+  // ── Supabase session + admin route protection ─────────────────────────────
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.next()
   }
 
   const { response, user } = await updateSession(request)
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
-
-  if (isAdminRoute && !user) {
+  if (pathname.startsWith('/admin') && !user) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
-    loginUrl.searchParams.set('next', request.nextUrl.pathname)
+    loginUrl.searchParams.set('next', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
@@ -23,7 +41,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Run on all routes except Next.js internals and static files
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
