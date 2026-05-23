@@ -216,10 +216,22 @@ export async function POST(request: NextRequest) {
           }))
 
         if (itemsToInsert.length) {
-          await supabase.from('order_items').insert(itemsToInsert)
+          const { error: itemsError } = await supabase
+            .from('order_items')
+            .insert(itemsToInsert)
+          if (itemsError) {
+            console.error('[checkout] order_items insert failed:', itemsError.message, itemsError.details)
+            throw itemsError
+          }
+        } else {
+          console.error('[checkout] No items matched slugToId — nothing to insert', {
+            cartSlugs: validatedItems.map((i) => i.artwork_slug),
+            resolvedSlugs: Object.keys(slugToId),
+          })
         }
       } catch (dbErr) {
-        console.warn('[checkout] Could not create DB order record:', dbErr)
+        console.error('[checkout] DB order creation failed:', dbErr)
+        throw dbErr
       }
     }
 
