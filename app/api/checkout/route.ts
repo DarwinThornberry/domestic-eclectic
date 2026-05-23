@@ -207,6 +207,7 @@ export async function POST(request: NextRequest) {
             order_id: orderId,
             artwork_id: slugToId[item.artwork_slug],
             artwork_title_snapshot: item.artwork_title,
+            artwork_slug_snapshot: item.artwork_slug,
             material: item.material,
             size: item.size,
             framing: item.framing,
