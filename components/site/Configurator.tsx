@@ -273,12 +273,12 @@ export function Configurator({ artwork, tiers }: Props) {
           {sizeOpen && (
             <div className="absolute top-full left-0 right-0 z-30 bg-bone-dark border border-ink/[0.35] border-t-0 max-h-72 overflow-y-auto shadow-lg">
               {(['standard', 'square', 'rectangular'] as const).map((group) => {
-                const opts = SIZE_GROUPS[group].filter(
-                  (s) =>
-                    config.material === 'canvas_satin' || config.material === 'canvas_lustre'
-                      ? s.key !== '210x297'
-                      : true,
-                )
+                const isCanvas = config.material === 'canvas_satin' || config.material === 'canvas_lustre'
+                const opts = SIZE_GROUPS[group].filter((s) => {
+                  if (isCanvas && s.key === '210x297') return false
+                  if (artwork.allowedSizes?.length && !artwork.allowedSizes.includes(s.key)) return false
+                  return true
+                })
                 if (!opts.length) return null
                 return (
                   <div key={group}>

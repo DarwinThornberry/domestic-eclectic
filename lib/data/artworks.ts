@@ -38,6 +38,8 @@ export interface ArtworkData {
   customMarkupMedium?: number | null
   customMarkupLarge?:  number | null
   priceOverrides?: Record<string, number> | null
+  /** When set, only these size codes are shown in the configurator size picker */
+  allowedSizes?: string[] | null
 }
 
 // ─── Artwork catalogue ────────────────────────────────────────────────────────

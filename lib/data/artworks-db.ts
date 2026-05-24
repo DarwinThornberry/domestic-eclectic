@@ -64,6 +64,7 @@ function toArtworkData(row: ArtworkRow): ArtworkData {
     customMarkupMedium: r.custom_markup_medium ?? null,
     customMarkupLarge:  r.custom_markup_large ?? null,
     priceOverrides:     r.price_overrides ?? null,
+    allowedSizes:       r.allowed_sizes ?? null,
   }
 }
 
