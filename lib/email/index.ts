@@ -88,7 +88,7 @@ export async function sendContactNotification(name: string, senderEmail: string,
   await resend.emails.send({
     from: FROM_ADDRESS,
     to: CONTACT_ADMIN_EMAIL,
-    reply_to: senderEmail,
+    replyTo: senderEmail,
     subject: `New message from ${name}`,
     html: contactNotificationHtml(name, senderEmail, message),
   })
