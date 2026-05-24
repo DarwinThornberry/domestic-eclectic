@@ -60,6 +60,7 @@ async function getStats() {
       .gte('created_at', startOfMonth),
     supabase.from('orders')
       .select('id, order_number, customer_name, status, total_aud, created_at, order_items(quantity, artwork_title_snapshot)')
+      .neq('status', 'pending')
       .order('created_at', { ascending: false })
       .limit(10),
   ])

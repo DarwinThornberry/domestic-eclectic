@@ -9,6 +9,7 @@ import {
   formatDollars,
   getSizeBand,
   getSizeOptions,
+  SIZE_GROUPS,
   type PricingTiers,
 } from '@/lib/pricing/southern-buoy'
 import { MATERIAL_LABELS, FRAMING_LABELS } from '@/lib/constants'
@@ -136,33 +137,36 @@ function ViewPricingModal({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+const ALL_SIZES = [
+  ...SIZE_GROUPS.standard,
+  ...SIZE_GROUPS.square,
+  ...SIZE_GROUPS.rectangular,
+]
+
+interface Props {
+  artworkId: string
+  initialPricingMode: PricingMode
+  initialFixedPrices: Record<string, number> | null
+  initialPriceOverrides: Record<string, number> | null
+  allowedSizes?: string[] | null
+  tiers: PricingTiers
+}
+
 export function ArtworkPricingSection({
   artworkId,
   initialPricingMode,
-  initialCustomMarkup,
-  initialCustomMarkupSmall,
-  initialCustomMarkupMedium,
-  initialCustomMarkupLarge,
   initialFixedPrices,
   initialPriceOverrides,
+  allowedSizes,
   tiers,
 }: Props) {
-  // Option A vs B — whether to use custom band markups
-  const [useCustomMarkups, setUseCustomMarkups] = useState(
-    initialPricingMode === 'custom_band_markups' || initialPricingMode === 'custom_markup',
-  )
-  // Option C — whether to have per-combo price overrides
-  const [useOverrides, setUseOverrides] = useState(
+  const [useCustomPrices, setUseCustomPrices] = useState(
     (initialPriceOverrides && Object.keys(initialPriceOverrides).length > 0) ||
     (initialFixedPrices   && Object.keys(initialFixedPrices).length > 0) ||
-    initialPricingMode === 'fixed_prices',
+    initialPricingMode !== 'default',
   )
 
-  const [markupSmall,  setMarkupSmall]  = useState(String(initialCustomMarkupSmall  ?? initialCustomMarkup ?? tiers.markupSmall))
-  const [markupMedium, setMarkupMedium] = useState(String(initialCustomMarkupMedium ?? initialCustomMarkup ?? tiers.markupMedium))
-  const [markupLarge,  setMarkupLarge]  = useState(String(initialCustomMarkupLarge  ?? initialCustomMarkup ?? tiers.markupLarge))
-
-  // Seed overrides from either price_overrides (new) or fixed_prices (legacy)
+  // Seed from price_overrides (new) or fixed_prices (legacy)
   const [overrides, setOverrides] = useState<Record<string, number>>(
     initialPriceOverrides ?? initialFixedPrices ?? {},
   )
@@ -172,7 +176,10 @@ export function ArtworkPricingSection({
   const [error, setError] = useState<string | null>(null)
   const [viewOpen, setViewOpen] = useState(false)
 
-  const isCustomised = useCustomMarkups || useOverrides
+  // Show only the artwork's offered sizes; fall back to all sizes if none configured
+  const sizesToShow = allowedSizes?.length
+    ? ALL_SIZES.filter((s) => allowedSizes.includes(s.key))
+    : ALL_SIZES
 
   function setOverridePrice(key: string, dollars: string) {
     const cents = Math.round(parseFloat(dollars) * 100)
@@ -192,36 +199,12 @@ export function ArtworkPricingSection({
   function handleSave() {
     setError(null)
     setSaved(false)
-
-    let pricingMode: PricingMode = 'default'
-    let customMarkupSmall: number | null = null
-    let customMarkupMedium: number | null = null
-    let customMarkupLarge: number | null = null
-    let priceOverridesData: Record<string, number> | null = null
-
-    if (useCustomMarkups) {
-      pricingMode = 'custom_band_markups'
-      customMarkupSmall  = parseFloat(markupSmall)  || null
-      customMarkupMedium = parseFloat(markupMedium) || null
-      customMarkupLarge  = parseFloat(markupLarge)  || null
-    }
-
-    if (useOverrides && Object.keys(overrides).length > 0) {
-      priceOverridesData = overrides
-    }
+    const priceOverridesData =
+      useCustomPrices && Object.keys(overrides).length > 0 ? overrides : null
 
     startTransition(async () => {
       try {
-        await saveArtworkPricing(
-          artworkId,
-          pricingMode,
-          null,
-          null,
-          customMarkupSmall,
-          customMarkupMedium,
-          customMarkupLarge,
-          priceOverridesData,
-        )
+        await saveArtworkPricing(artworkId, 'default', null, null, null, null, null, priceOverridesData)
         setSaved(true)
       } catch (e: any) {
         setError(e.message ?? 'Could not save.')
@@ -234,9 +217,9 @@ export function ArtworkPricingSection({
 
       <div className="flex items-center justify-between">
         <p className="text-xs text-ink-muted">
-          {isCustomised
-            ? 'This work uses custom pricing.'
-            : 'This work uses the default tier markups.'}
+          {useCustomPrices
+            ? 'This work uses custom prices.'
+            : 'This work uses the default tier pricing.'}
         </p>
         <button
           onClick={() => setViewOpen(true)}
@@ -246,183 +229,86 @@ export function ArtworkPricingSection({
         </button>
       </div>
 
-      {/* Toggle customisation on/off */}
       <label className="flex items-center gap-3 cursor-pointer">
         <input
           type="checkbox"
-          checked={isCustomised}
-          onChange={(e) => {
-            if (!e.target.checked) {
-              setUseCustomMarkups(false)
-              setUseOverrides(false)
-            } else {
-              setUseCustomMarkups(true)
-            }
-            setSaved(false)
-          }}
+          checked={useCustomPrices}
+          onChange={(e) => { setUseCustomPrices(e.target.checked); setSaved(false) }}
           className="accent-ink w-4 h-4"
         />
-        <span className="text-sm text-ink">Customise pricing for this work</span>
+        <span className="text-sm text-ink">Set custom prices for this work</span>
       </label>
 
-      {isCustomised && (
-        <div className="flex flex-col gap-6 pl-7 border-l-2 border-border">
-
-          {/* Option B: custom band markups */}
-          <div>
-            <label className="flex items-center gap-3 cursor-pointer mb-3">
-              <input
-                type="checkbox"
-                checked={useCustomMarkups}
-                onChange={(e) => { setUseCustomMarkups(e.target.checked); setSaved(false) }}
-                className="accent-ink w-4 h-4"
-              />
-              <div>
-                <span className="text-sm text-ink">Custom markups per size band</span>
-                <p className="text-xs text-ink-muted mt-0.5">
-                  Override the global markup for Small, Medium, and/or Large sizes.
-                </p>
+      {useCustomPrices && (
+        <div className="flex flex-col gap-7 pl-7 border-l-2 border-border">
+          {sizesToShow.map((size) => (
+            <div key={size.key}>
+              <p className="text-xs font-medium text-ink mb-2">{size.dims}</p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border border-border">
+                  <thead>
+                    <tr className="bg-bone-dark border-b border-border">
+                      <th className="text-left px-3 py-2 text-ink-muted font-normal">Material</th>
+                      {TABLE_FRAMINGS.map((f) => (
+                        <th key={f} className="text-right px-3 py-2 text-ink-muted font-normal whitespace-nowrap">
+                          {FRAMING_LABELS[f]}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {MATERIALS.map((mat) => (
+                      <tr key={mat} className="border-t border-border">
+                        <td className="px-3 py-2 text-ink whitespace-nowrap">{MATERIAL_LABELS[mat]}</td>
+                        {TABLE_FRAMINGS.map((framing) => {
+                          const key = `${mat}:${size.key}:${framing}`
+                          const wholesale = getWholesaleCostDollars(mat as Material, size.key, framing as Framing)
+                          if (wholesale === null) {
+                            return <td key={framing} className="px-3 py-2 text-right text-ink-muted">—</td>
+                          }
+                          const defaultPrice = calculatePrice(mat as Material, size.key, framing as Framing, tiers)!
+                          const hasOverride = overrides[key] !== undefined
+                          const displayVal = hasOverride
+                            ? (overrides[key] / 100).toFixed(2)
+                            : (defaultPrice / 100).toFixed(2)
+                          return (
+                            <td key={framing} className="px-3 py-2 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <span className="text-ink-muted">$</span>
+                                <input
+                                  type="number"
+                                  value={displayVal}
+                                  onChange={(e) => setOverridePrice(key, e.target.value)}
+                                  min="0"
+                                  step="1"
+                                  className={`w-20 border bg-transparent px-2 py-1 text-xs text-right focus:outline-none focus:border-ink transition-colors ${
+                                    hasOverride ? 'border-terracotta text-ink' : 'border-border text-ink-muted'
+                                  }`}
+                                />
+                                {hasOverride && (
+                                  <button
+                                    onClick={() => resetOverride(key)}
+                                    title="Reset to default"
+                                    className="text-ink-muted hover:text-terracotta transition-colors"
+                                  >
+                                    <X size={11} />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </label>
-
-            {useCustomMarkups && (
-              <div className="grid grid-cols-3 gap-3 mt-2">
-                {(
-                  [
-                    { key: 'small',  label: 'Small',  val: markupSmall,  set: setMarkupSmall,  globalVal: tiers.markupSmall  },
-                    { key: 'medium', label: 'Medium', val: markupMedium, set: setMarkupMedium, globalVal: tiers.markupMedium },
-                    { key: 'large',  label: 'Large',  val: markupLarge,  set: setMarkupLarge,  globalVal: tiers.markupLarge  },
-                  ] as const
-                ).map(({ key, label, val, set, globalVal }) => (
-                  <div key={key}>
-                    <label className="text-xs text-ink-muted block mb-1">
-                      {label}{' '}
-                      <span className={`caption text-[9px] px-1 py-0.5 ml-0.5 ${BAND_COLOUR[key]}`}>
-                        {BAND_LABEL[key]}
-                      </span>
-                    </label>
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="number"
-                        value={val}
-                        onChange={(e) => { set(e.target.value); setSaved(false) }}
-                        placeholder={String(globalVal)}
-                        min="1"
-                        step="0.1"
-                        className="w-full border border-border bg-transparent px-3 py-2 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
-                      />
-                      <span className="text-xs text-ink-muted shrink-0">×</span>
-                    </div>
-                    <p className="text-[11px] text-ink-muted mt-1">Default: {globalVal}×</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Option C: price overrides */}
-          <div>
-            <label className="flex items-center gap-3 cursor-pointer mb-3">
-              <input
-                type="checkbox"
-                checked={useOverrides}
-                onChange={(e) => { setUseOverrides(e.target.checked); setSaved(false) }}
-                className="accent-ink w-4 h-4"
-              />
-              <div>
-                <span className="text-sm text-ink">Override specific prices</span>
-                <p className="text-xs text-ink-muted mt-0.5">
-                  Set exact dollar amounts for individual size/material/framing combinations.
-                  These take priority over any markup.
-                </p>
-              </div>
-            </label>
-
-            {useOverrides && (
-              <div className="overflow-x-auto mt-2">
-                {MATERIALS.map((mat) => {
-                  const sizes = getSizeOptions(mat)
-                  return (
-                    <details key={mat} className="border border-border mb-2">
-                      <summary className="px-4 py-2.5 text-xs text-ink-muted cursor-pointer hover:bg-bone-dark transition-colors select-none">
-                        {MATERIAL_LABELS[mat]}
-                      </summary>
-                      <table className="w-full text-xs border-t border-border">
-                        <thead>
-                          <tr className="bg-bone-dark">
-                            <th className="text-left px-3 py-2 text-ink-muted font-normal">Size</th>
-                            <th className="px-2 py-2 text-ink-muted font-normal text-center">Band</th>
-                            {TABLE_FRAMINGS.map((f) => (
-                              <th key={f} className="text-right px-3 py-2 text-ink-muted font-normal whitespace-nowrap">
-                                {FRAMING_LABELS[f]}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sizes.map((size) => {
-                            const band = getSizeBand(size.key)
-                            return (
-                              <tr key={size.key} className="border-t border-border">
-                                <td className="px-3 py-2 text-ink whitespace-nowrap">{size.label}</td>
-                                <td className="px-2 py-2 text-center">
-                                  <span className={`caption text-[9px] px-1 py-0.5 ${BAND_COLOUR[band]}`}>
-                                    {BAND_LABEL[band]}
-                                  </span>
-                                </td>
-                                {TABLE_FRAMINGS.map((framing) => {
-                                  const key = `${mat}:${size.key}:${framing}`
-                                  const wholesale = getWholesaleCostDollars(mat as Material, size.key, framing as Framing)
-                                  if (wholesale === null) {
-                                    return <td key={framing} className="px-3 py-2 text-right text-ink-muted">—</td>
-                                  }
-                                  const defaultPrice = calculatePrice(mat as Material, size.key, framing as Framing, tiers)!
-                                  const hasOverride = overrides[key] !== undefined
-                                  const displayVal = hasOverride
-                                    ? (overrides[key] / 100).toFixed(2)
-                                    : (defaultPrice / 100).toFixed(2)
-                                  return (
-                                    <td key={framing} className="px-3 py-2 text-right">
-                                      <div className="flex items-center justify-end gap-1">
-                                        <span className="text-ink-muted">$</span>
-                                        <input
-                                          type="number"
-                                          value={displayVal}
-                                          onChange={(e) => { setOverridePrice(key, e.target.value) }}
-                                          min="0"
-                                          step="1"
-                                          className={`w-20 border bg-transparent px-2 py-1 text-xs text-right focus:outline-none focus:border-ink transition-colors ${
-                                            hasOverride ? 'border-terracotta text-ink' : 'border-border text-ink-muted'
-                                          }`}
-                                        />
-                                        {hasOverride && (
-                                          <button
-                                            onClick={() => resetOverride(key)}
-                                            title="Reset to default"
-                                            className="text-ink-muted hover:text-terracotta transition-colors"
-                                          >
-                                            <X size={11} />
-                                          </button>
-                                        )}
-                                      </div>
-                                    </td>
-                                  )
-                                })}
-                              </tr>
-                            )
-                          })}
-                        </tbody>
-                      </table>
-                      <p className="text-xs text-ink-muted px-4 py-2 border-t border-border">
-                        Overridden prices are highlighted. Click × to reset a cell to the calculated default.
-                        Premium frame column shows White; all premium colours share the same wholesale upcharge.
-                      </p>
-                    </details>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+              <p className="text-[11px] text-ink-muted mt-1.5">
+                Highlighted cells have a custom price. Click × to reset to the calculated default.
+                Premium frame column shows White; all premium colours share the same upcharge.
+              </p>
+            </div>
+          ))}
         </div>
       )}
 

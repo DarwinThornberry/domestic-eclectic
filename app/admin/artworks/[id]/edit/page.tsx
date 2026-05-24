@@ -70,19 +70,15 @@ export default async function EditArtworkPage({ params }: { params: Promise<{ id
         <div className="mb-6">
           <h2 className="caption text-ink tracking-[0.12em]">PRICING</h2>
           <p className="text-xs text-ink-muted mt-1.5">
-            By default this work uses the global tier markups (S:{tiers.markupSmall}× / M:{tiers.markupMedium}× / L:{tiers.markupLarge}×).
-            Turn on custom pricing to set different rates for this work.
+            By default this work uses the global tier pricing. Turn on custom pricing to set exact prices for this work.
           </p>
         </div>
         <ArtworkPricingSection
           artworkId={artwork.id}
           initialPricingMode={a.pricing_mode ?? 'default'}
-          initialCustomMarkup={a.custom_markup ?? null}
-          initialCustomMarkupSmall={a.custom_markup_small ?? null}
-          initialCustomMarkupMedium={a.custom_markup_medium ?? null}
-          initialCustomMarkupLarge={a.custom_markup_large ?? null}
           initialFixedPrices={a.fixed_prices ?? null}
           initialPriceOverrides={a.price_overrides ?? null}
+          allowedSizes={a.allowed_sizes ?? null}
           tiers={tiers}
         />
       </div>

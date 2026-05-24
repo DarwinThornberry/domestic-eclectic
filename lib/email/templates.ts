@@ -9,19 +9,25 @@ const styles = {
   h2: 'font-family: Georgia, serif; font-size: 22px; font-style: italic; font-weight: 400; color: #1A1814; margin: 0 0 8px;',
   lead: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 14px; color: #4A4540; line-height: 1.6; margin: 0 0 24px;',
   sectionLabel: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10px; letter-spacing: 3px; color: #9A6B4F; text-transform: uppercase; margin: 24px 0 10px; padding-top: 20px; border-top: 1px solid #E5DFD5;',
-  itemTitle: 'font-family: Georgia, serif; font-size: 16px; font-style: italic; color: #1A1814; margin: 0 0 2px;',
-  itemDetail: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; color: #4A4540; margin: 0 0 8px;',
+  itemTitle: 'font-family: Georgia, serif; font-size: 16px; font-style: italic; color: #1A1814; margin: 0 0 5px;',
+  itemDetail: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; color: #4A4540; line-height: 1.5; margin: 0 0 6px;',
+  itemTotal: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; color: #4A4540; margin: 0;',
   small: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; color: #4A4540;',
   mono: 'font-family: "Courier New", monospace; font-size: 11px; color: #4A4540;',
   address: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: #1A1814; line-height: 1.8;',
   totalRow: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 4px 0;',
-  totalFinal: 'font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; padding: 10px 0 0; border-top: 1px solid #E5DFD5; margin-top: 4px;',
+  totalFinal: 'font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; padding: 10px 0 4px; border-top: 1px solid #E5DFD5; margin-top: 4px;',
+  totalGst: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11px; color: #9A6B4F; padding: 0; margin: 0;',
   btn: 'display: inline-block; background: #1A1814; color: #F2EBD9; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; padding: 14px 28px; margin-top: 24px;',
   footer: 'font-family: "Helvetica Neue", Arial, sans-serif; font-size: 11px; color: #4A4540; border-top: 1px solid #E5DFD5; margin-top: 40px; padding-top: 20px; line-height: 1.7;',
 }
 
 function formatCents(cents: number): string {
   return `$${(cents / 100).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} AUD`
+}
+
+function titleCase(str: string): string {
+  return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 function wordmark(): string {
@@ -31,12 +37,52 @@ function wordmark(): string {
   `
 }
 
+// Used by adminNotificationHtml and shippedNotificationHtml — unchanged
 function itemsBlock(order: OrderWithItems): string {
   return order.order_items.map((item) => `
     <div style="margin-bottom: 16px;">
       <p style="${styles.itemTitle}">${item.artwork_title_snapshot}</p>
       <p style="${styles.itemDetail}">${item.material.replace(/_/g, ' ')} · ${item.size.replace('x', ' × ')} mm · ${item.framing.replace(/_/g, ' ')} · Qty ${item.quantity}</p>
       <p style="${styles.itemDetail}">Line total: ${formatCents(item.line_total_aud)}</p>
+    </div>
+  `).join('')
+}
+
+// Cleaner item layout for the customer confirmation email
+function customerItemsBlock(order: OrderWithItems): string {
+  return order.order_items.map((item) => `
+    <div style="margin-bottom: 20px;">
+      <p style="${styles.itemTitle}">${item.artwork_title_snapshot}</p>
+      <p style="${styles.itemDetail}">${titleCase(item.material)} &middot; ${item.size.replace('x', ' &times; ')} mm &middot; ${titleCase(item.framing)} &middot; Qty&nbsp;${item.quantity}</p>
+      <p style="${styles.itemTotal}">Line total: ${formatCents(item.line_total_aud)}</p>
+    </div>
+  `).join('')
+}
+
+// Large, high-legibility item layout for the printer fulfilment email
+function printerItemsBlock(order: OrderWithItems): string {
+  const label = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #9A6B4F; padding: 6px 18px 6px 0; width: 90px; vertical-align: middle;`
+  return order.order_items.map((item) => `
+    <div style="margin-bottom: 20px; padding: 22px 24px; background: #EAE0CC; border-left: 5px solid #9A6B4F;">
+      <p style="font-family: Georgia, serif; font-size: 22px; font-style: italic; color: #1A1814; margin: 0 0 18px; line-height: 1.3;">${item.artwork_title_snapshot}</p>
+      <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="${label}">Size</td>
+          <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 20px; font-weight: 700; color: #1A1814; padding: 6px 0;">${item.size.replace('x', ' &times; ')} mm</td>
+        </tr>
+        <tr>
+          <td style="${label}">Material</td>
+          <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #1A1814; padding: 6px 0;">${titleCase(item.material)}</td>
+        </tr>
+        <tr>
+          <td style="${label}">Framing</td>
+          <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 600; color: #1A1814; padding: 6px 0;">${titleCase(item.framing)}</td>
+        </tr>
+        <tr>
+          <td style="${label}">Qty</td>
+          <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 28px; font-weight: 700; color: #1A1814; padding: 6px 0;">${item.quantity}</td>
+        </tr>
+      </table>
     </div>
   `).join('')
 }
@@ -53,6 +99,21 @@ function addressBlock(order: OrderWithItems): string {
   `
 }
 
+// Large, bold ship-to address for the printer fulfilment email
+function printerAddressBlock(order: OrderWithItems): string {
+  const a = order.shipping_address
+  return `
+    <div style="padding: 22px 24px; background: #EAE0CC; border-left: 5px solid #1A1814;">
+      <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 17px; font-weight: 700; color: #1A1814; line-height: 1.9; margin: 0;">
+        ${a.name}<br>
+        ${a.line1}${a.line2 ? '<br>' + a.line2 : ''}<br>
+        ${a.city}${a.state ? ', ' + a.state : ''}&nbsp;${a.postal_code}<br>
+        ${a.country}
+      </p>
+    </div>
+  `
+}
+
 export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): string {
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Print Order — ${order.order_number}</title></head>
@@ -66,7 +127,7 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
   <p style="${styles.small}"><strong>${order.order_number}</strong> · Placed ${new Date(order.created_at).toLocaleDateString('en-AU', { dateStyle: 'long' })}</p>
 
   <p style="${styles.sectionLabel}">Items</p>
-  ${itemsBlock(order)}
+  ${printerItemsBlock(order)}
 
   ${printFileUrl ? `
   <p style="${styles.sectionLabel}">Print File</p>
@@ -78,7 +139,7 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
   `}
 
   <p style="${styles.sectionLabel}">Ship To</p>
-  ${addressBlock(order)}
+  ${printerAddressBlock(order)}
 
   <p style="${styles.sectionLabel}">Totals</p>
   <p style="${styles.totalRow}">Subtotal: ${formatCents(order.subtotal_aud)}</p>
@@ -95,6 +156,7 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
 
 export function customerConfirmationHtml(order: OrderWithItems): string {
   const firstName = order.customer_name.split(' ')[0]
+  const gstCents = Math.round(order.total_aud / 11)
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Order confirmed — ${order.order_number}</title></head>
@@ -105,7 +167,7 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
   <p style="${styles.lead}">Your order has been confirmed. We'll be in touch when your print is on its way.</p>
 
   <p style="${styles.sectionLabel}">Your Order — ${order.order_number}</p>
-  ${itemsBlock(order)}
+  ${customerItemsBlock(order)}
 
   <p style="${styles.sectionLabel}">Shipping To</p>
   ${addressBlock(order)}
@@ -114,10 +176,11 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
   <p style="${styles.totalRow}">Subtotal: ${formatCents(order.subtotal_aud)}</p>
   <p style="${styles.totalRow}">Shipping: ${formatCents(order.shipping_aud)}</p>
   <p style="${styles.totalFinal}">Total: ${formatCents(order.total_aud)}</p>
+  <p style="${styles.totalGst}">Includes GST: ${formatCents(gstCents)}</p>
 
   <p style="${styles.sectionLabel}">What happens next</p>
   <p style="${styles.small}">Your print will be produced on archival materials by Southern Buoy in Mornington, Victoria. Australian orders typically arrive within 7–14 business days of dispatch. You'll receive a shipping notification once your order leaves the studio.</p>
-  <p style="${styles.small}" style="margin-top: 12px;">Questions? Reply to this email or visit <a href="https://domesticeclectic.com.au/contact" style="color: #9A6B4F;">our contact page</a>.</p>
+  <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #4A4540; margin-top: 12px;">Questions? Reply to this email or visit <a href="https://domesticeclectic.com.au/contact" style="color: #9A6B4F;">our contact page</a>.</p>
 
   <p style="${styles.footer}">
     Domestic Eclectic · Fine Art Prints by Lara Stocco<br>
