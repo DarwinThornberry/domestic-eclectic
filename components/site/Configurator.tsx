@@ -84,6 +84,7 @@ function StepHeading({ children }: { children: React.ReactNode }) {
 interface Props {
   artwork: ArtworkData
   tiers: PricingTiers
+  globalPriceOverrides: Record<string, number>
 }
 
 type FramingCategory = 'unframed' | 'standard' | 'premium'
@@ -96,7 +97,7 @@ interface Config {
   quantity: number
 }
 
-export function Configurator({ artwork, tiers }: Props) {
+export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
   const { addItem } = useCart()
 
   const [config, setConfig] = useState<Config>({
@@ -147,8 +148,9 @@ export function Configurator({ artwork, tiers }: Props) {
       artwork.customMarkupMedium ?? null,
       artwork.customMarkupLarge  ?? null,
       artwork.priceOverrides ?? null,
+      globalPriceOverrides,
     )
-  }, [config.material, config.size, framing, tiers, artwork.pricingMode, artwork.customMarkup, artwork.fixedPrices, artwork.customMarkupSmall, artwork.customMarkupMedium, artwork.customMarkupLarge, artwork.priceOverrides])
+  }, [config.material, config.size, framing, tiers, artwork.pricingMode, artwork.customMarkup, artwork.fixedPrices, artwork.customMarkupSmall, artwork.customMarkupMedium, artwork.customMarkupLarge, artwork.priceOverrides, globalPriceOverrides])
 
   // ── Validation ─────────────────────────────────────────────────────────────
   const isReady = config.material !== null && config.size !== null && framing !== null

@@ -10,7 +10,15 @@ import { Configurator } from '@/components/site/Configurator'
 import type { ArtworkData } from '@/lib/data/artworks'
 import type { PricingTiers } from '@/lib/pricing/southern-buoy'
 
-export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers: PricingTiers }) {
+export function ArtworkDetail({
+  artwork,
+  tiers,
+  globalPriceOverrides,
+}: {
+  artwork: ArtworkData
+  tiers: PricingTiers
+  globalPriceOverrides: Record<string, number>
+}) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   return (
@@ -99,7 +107,7 @@ export function ArtworkDetail({ artwork, tiers }: { artwork: ArtworkData; tiers:
 
           {/* Right: configurator */}
           <div className="lg:sticky lg:top-8 lg:self-start">
-            <Configurator artwork={artwork} tiers={tiers} />
+            <Configurator artwork={artwork} tiers={tiers} globalPriceOverrides={globalPriceOverrides} />
           </div>
         </div>
 

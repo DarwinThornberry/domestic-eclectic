@@ -17,25 +17,40 @@ export async function getMarkup(): Promise<number> {
 
 /** Fetches the three-tier markup + rounding settings from DB. Safe to call from server components. */
 export async function getPricingTiers(): Promise<PricingTiers> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return DEFAULT_TIERS
+  const { tiers } = await getPricingSettings()
+  return tiers
+}
+
+/**
+ * Single DB call that returns both pricing tiers and the global per-combo price overrides
+ * from Settings > Costs. Use this on the storefront where both are needed.
+ */
+export async function getPricingSettings(): Promise<{
+  tiers: PricingTiers
+  globalPriceOverrides: Record<string, number>
+}> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return { tiers: DEFAULT_TIERS, globalPriceOverrides: {} }
   try {
     const supabase = await createClient()
     const { data } = await supabase
       .from('settings')
-      .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large')
+      .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large, global_price_overrides')
       .eq('id', 1)
       .single()
-    if (!data) return DEFAULT_TIERS
+    if (!data) return { tiers: DEFAULT_TIERS, globalPriceOverrides: {} }
     return {
-      markupSmall:    Number(data.markup_small)   || DEFAULT_TIERS.markupSmall,
-      markupMedium:   Number(data.markup_medium)  || DEFAULT_TIERS.markupMedium,
-      markupLarge:    Number(data.markup_large)   || DEFAULT_TIERS.markupLarge,
-      roundingSmall:  Number(data.rounding_small)  ?? DEFAULT_TIERS.roundingSmall,
-      roundingMedium: Number(data.rounding_medium) ?? DEFAULT_TIERS.roundingMedium,
-      roundingLarge:  Number(data.rounding_large)  ?? DEFAULT_TIERS.roundingLarge,
+      tiers: {
+        markupSmall:    Number(data.markup_small)    || DEFAULT_TIERS.markupSmall,
+        markupMedium:   Number(data.markup_medium)   || DEFAULT_TIERS.markupMedium,
+        markupLarge:    Number(data.markup_large)    || DEFAULT_TIERS.markupLarge,
+        roundingSmall:  Number(data.rounding_small)  ?? DEFAULT_TIERS.roundingSmall,
+        roundingMedium: Number(data.rounding_medium) ?? DEFAULT_TIERS.roundingMedium,
+        roundingLarge:  Number(data.rounding_large)  ?? DEFAULT_TIERS.roundingLarge,
+      },
+      globalPriceOverrides: (data.global_price_overrides as Record<string, number>) ?? {},
     }
   } catch {
-    return DEFAULT_TIERS
+    return { tiers: DEFAULT_TIERS, globalPriceOverrides: {} }
   }
 }
 

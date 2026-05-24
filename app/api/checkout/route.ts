@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
 
     // ── 1. Fetch global settings (tiers) and per-artwork pricing ─────────────
     let globalTiers: PricingTiers = DEFAULT_TIERS
+    let globalPriceOverrides: Record<string, number> = {}
     let artworkPricingMap: Record<string, {
       pricing_mode: string
       custom_markup: number | null
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       // Fetch tier markups from settings
       const { data: settings } = await supabase
         .from('settings')
-        .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large')
+        .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large, global_price_overrides')
         .eq('id', 1)
         .single()
       if (settings) {
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
           roundingMedium: Number(settings.rounding_medium) ?? DEFAULT_TIERS.roundingMedium,
           roundingLarge:  Number(settings.rounding_large)  ?? DEFAULT_TIERS.roundingLarge,
         }
+        globalPriceOverrides = (settings.global_price_overrides as Record<string, number>) ?? {}
       }
 
       // Fetch per-artwork pricing for all artworks in cart
@@ -122,11 +124,12 @@ export async function POST(request: NextRequest) {
             ap.custom_markup_medium,
             ap.custom_markup_large,
             ap.price_overrides,
+            globalPriceOverrides,
           )
         : null
 
       const price = serverPrice ??
-        calculatePrice(item.material as Material, item.size, item.framing as Framing, globalTiers)
+        calculatePrice(item.material as Material, item.size, item.framing as Framing, globalTiers, undefined, globalPriceOverrides)
 
       if (!price) {
         throw new Error(

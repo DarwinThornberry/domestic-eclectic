@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPublishedArtwork, getPublishedArtworkSlugs } from '@/lib/data/artworks-db'
-import { getPricingTiers } from '@/lib/data/artworks-db'
+import { getPublishedArtwork, getPublishedArtworkSlugs, getPricingSettings } from '@/lib/data/artworks-db'
 import { ArtworkDetail } from '@/components/site/ArtworkDetail'
 
 interface Props {
@@ -9,14 +8,14 @@ interface Props {
 
 export default async function ArtworkPage({ params }: Props) {
   const { slug } = await params
-  const [artwork, tiers] = await Promise.all([
+  const [artwork, { tiers, globalPriceOverrides }] = await Promise.all([
     getPublishedArtwork(slug),
-    getPricingTiers(),
+    getPricingSettings(),
   ])
 
   if (!artwork) notFound()
 
-  return <ArtworkDetail artwork={artwork} tiers={tiers} />
+  return <ArtworkDetail artwork={artwork} tiers={tiers} globalPriceOverrides={globalPriceOverrides} />
 }
 
 export async function generateStaticParams() {
