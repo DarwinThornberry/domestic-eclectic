@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { Loader2, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { saveGlobalPriceOverrides } from '@/app/admin/actions'
 import {
   getWholesaleCostDollars,
   calculatePrice,
   getShippingReference,
   formatDollars,
-  getSizeBand,
   SIZE_GROUPS,
   type PricingTiers,
 } from '@/lib/pricing/southern-buoy'
@@ -24,9 +24,9 @@ const MATERIAL_OPTIONS: { key: MaterialTab; label: string }[] = [
 ]
 
 const FRAMING_OPTIONS: { key: FramingTab; label: string; framing: Framing }[] = [
-  { key: 'unframed',  label: 'Unframed',                       framing: 'unframed' },
-  { key: 'standard',  label: 'Standard Frame (Flooded Gum)',   framing: 'standard_flooded_gum' },
-  { key: 'premium',   label: 'Premium Frame (+$25 upcharge)',  framing: 'premium_white' },
+  { key: 'unframed',  label: 'Unframed',                      framing: 'unframed' },
+  { key: 'standard',  label: 'Standard Frame (Flooded Gum)',  framing: 'standard_flooded_gum' },
+  { key: 'premium',   label: 'Premium Frame (+$25 upcharge)', framing: 'premium_white' },
 ]
 
 const ALL_SIZES = [
@@ -35,61 +35,69 @@ const ALL_SIZES = [
   ...SIZE_GROUPS.rectangular,
 ]
 
-const BAND_LABEL: Record<string, string> = { small: 'S', medium: 'M', large: 'L' }
-const BAND_COLOUR: Record<string, string> = {
-  small:  'bg-terracotta/10 text-terracotta',
-  medium: 'bg-olive/10 text-olive',
-  large:  'bg-ink/10 text-ink-muted',
-}
-
 interface Props {
   tiers: PricingTiers
   activeSizes?: string[]
+  initialGlobalOverrides?: Record<string, number>
 }
 
-export function PricingCostsClient({ tiers, activeSizes = [] }: Props) {
+export function PricingCostsClient({ tiers, activeSizes = [], initialGlobalOverrides = {} }: Props) {
   const [material, setMaterial] = useState<MaterialTab>('cotton_rag_smooth')
   const [framingTab, setFramingTab] = useState<FramingTab>('unframed')
   const [shippingOpen, setShippingOpen] = useState(false)
+  const [overrides, setOverrides] = useState<Record<string, number>>(initialGlobalOverrides)
+  const [isPending, startTransition] = useTransition()
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const isCanvas = material === 'canvas_satin' || material === 'canvas_lustre'
   const currentFraming = FRAMING_OPTIONS.find((f) => f.key === framingTab)!.framing
   const sizes = isCanvas ? ALL_SIZES.filter((s) => s.key !== '210x297') : ALL_SIZES
-
   const shippingRef = getShippingReference()
 
-  // Determine which markup applies per band for the explainer
-  const bandMarkups = [
-    { band: 'small',  markup: tiers.markupSmall,  rounding: tiers.roundingSmall  },
-    { band: 'medium', markup: tiers.markupMedium, rounding: tiers.roundingMedium },
-    { band: 'large',  markup: tiers.markupLarge,  rounding: tiers.roundingLarge  },
-  ]
+  function commitPrice(key: string, dollars: string) {
+    const cents = Math.round(parseFloat(dollars) * 100)
+    if (!isNaN(cents) && cents >= 0) {
+      setOverrides((prev) => ({ ...prev, [key]: cents }))
+      setSaved(false)
+    }
+  }
+
+  function commitMarkup(key: string, pct: string, wholesaleDollars: number) {
+    const pctVal = parseFloat(pct)
+    if (!isNaN(pctVal)) {
+      const cents = Math.round(wholesaleDollars * (1 + pctVal / 100) * 100)
+      if (cents >= 0) {
+        setOverrides((prev) => ({ ...prev, [key]: cents }))
+        setSaved(false)
+      }
+    }
+  }
+
+  function resetPrice(key: string) {
+    setOverrides((prev) => {
+      const next = { ...prev }
+      delete next[key]
+      return next
+    })
+    setSaved(false)
+  }
+
+  function handleSave() {
+    setError(null)
+    setSaved(false)
+    startTransition(async () => {
+      try {
+        await saveGlobalPriceOverrides(overrides)
+        setSaved(true)
+      } catch (e: any) {
+        setError(e.message ?? 'Could not save.')
+      }
+    })
+  }
 
   return (
     <div className="flex flex-col gap-8">
-
-      {/* Explainer */}
-      <div className="border border-border bg-bone-dark px-5 py-4 text-sm text-ink-muted leading-relaxed max-w-2xl">
-        <p className="mb-3">
-          Prices use three size-band markups. Update these in{' '}
-          <a href="/admin/settings/pricing/strategy" className="text-ink underline underline-offset-2 hover:text-terracotta transition-colors">
-            Pricing Strategy
-          </a>.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          {bandMarkups.map(({ band, markup, rounding }) => (
-            <span key={band} className="flex items-center gap-1.5">
-              <span className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}>
-                {BAND_LABEL[band]}
-              </span>
-              <span className="text-ink">{markup}×</span>
-              {rounding > 0 && (
-                <span className="text-ink-muted text-xs">nearest ${rounding}</span>
-              )}
-            </span>
-          ))}
-        </div>
-      </div>
 
       {/* Material selector */}
       <div>
@@ -131,7 +139,7 @@ export function PricingCostsClient({ tiers, activeSizes = [] }: Props) {
         </div>
       </div>
 
-      {/* Cost table */}
+      {/* Price table */}
       <div>
         {activeSizes.length > 0 && (
           <p className="text-xs text-ink-muted mb-3">
@@ -143,41 +151,44 @@ export function PricingCostsClient({ tiers, activeSizes = [] }: Props) {
             <thead>
               <tr className="bg-bone-dark border-b border-border">
                 <th className="text-left px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Size</th>
-                <th className="px-3 py-3 text-xs text-ink-muted font-normal tracking-wide text-center">Band</th>
                 <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Wholesale</th>
-                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Customer price</th>
-                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Your profit</th>
+                <th className="text-right px-4 py-3 text-xs text-ink-muted font-normal tracking-wide">Price ($)</th>
+                <th className="text-right px-4 py-3 text-xs text-ink-muted font-normal tracking-wide">Markup (%)</th>
+                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Profit</th>
                 <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Margin</th>
               </tr>
             </thead>
             <tbody>
               {sizes.map((size) => {
                 const wholesale = getWholesaleCostDollars(material as Material, size.key, currentFraming as Framing)
-                const band = getSizeBand(size.key)
                 const isActive = activeSizes.length === 0 || activeSizes.includes(size.key)
 
                 if (wholesale === null) {
                   return (
                     <tr key={size.key} className={`border-t border-border ${!isActive ? 'opacity-40' : ''}`}>
                       <td className="px-5 py-3 text-ink">{size.label}</td>
-                      <td className="px-3 py-3 text-center">
-                        <span className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}>
-                          {BAND_LABEL[band]}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-center text-ink-muted" colSpan={4}>—</td>
+                      <td className="px-5 py-3 text-center text-ink-muted" colSpan={5}>—</td>
                     </tr>
                   )
                 }
 
-                const customerCents = calculatePrice(material as Material, size.key, currentFraming as Framing, tiers)!
-                const wholesaleCents = wholesale * 100
-                const profitCents = customerCents - wholesaleCents
-                const margin = ((profitCents / customerCents) * 100).toFixed(0)
-                const bandMarkup =
-                  band === 'small'  ? tiers.markupSmall  :
-                  band === 'medium' ? tiers.markupMedium :
-                                      tiers.markupLarge
+                const key = `${material}:${size.key}:${currentFraming}`
+                const hasOverride = overrides[key] !== undefined
+                const enginePrice = calculatePrice(material as Material, size.key, currentFraming as Framing, tiers)!
+                const priceCents = hasOverride ? overrides[key] : enginePrice
+                const wholesaleCents = Math.round(wholesale * 100)
+                const profitCents = priceCents - wholesaleCents
+                const margin = priceCents > 0 ? ((profitCents / priceCents) * 100).toFixed(0) : '0'
+                const markupPct = wholesaleCents > 0 ? ((priceCents / wholesaleCents - 1) * 100).toFixed(1) : '0'
+                const dollarDisplay = (priceCents / 100).toFixed(2)
+
+                // inputKey changes only when the committed price changes, forcing defaultValue remount
+                // so that editing one field updates the other after blur
+                const inputKey = `${key}:${priceCents}`
+
+                const inputClass = `border bg-transparent px-2 py-1 text-xs text-right focus:outline-none focus:border-ink transition-colors ${
+                  hasOverride ? 'border-terracotta text-ink' : 'border-border text-ink-muted'
+                }`
 
                 return (
                   <tr
@@ -196,16 +207,49 @@ export function PricingCostsClient({ tiers, activeSizes = [] }: Props) {
                         )}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-center">
-                      <span
-                        className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}
-                        title={`${bandMarkup}× markup`}
-                      >
-                        {BAND_LABEL[band]}
-                      </span>
-                    </td>
                     <td className="px-5 py-3 text-right text-ink-muted">{formatDollars(wholesaleCents)}</td>
-                    <td className="px-5 py-3 text-right text-ink font-medium">{formatDollars(customerCents)}</td>
+
+                    {/* Dollar input */}
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <span className="text-ink-muted text-xs">$</span>
+                        <input
+                          key={`d:${inputKey}`}
+                          type="number"
+                          defaultValue={dollarDisplay}
+                          onBlur={(e) => commitPrice(key, e.target.value)}
+                          min="0"
+                          step="1"
+                          className={`w-20 ${inputClass}`}
+                        />
+                        {hasOverride && (
+                          <button
+                            onClick={() => resetPrice(key)}
+                            title="Reset to engine default"
+                            className="text-ink-muted hover:text-terracotta transition-colors"
+                          >
+                            <X size={11} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Markup % input */}
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex items-center justify-end gap-0.5">
+                        <input
+                          key={`m:${inputKey}`}
+                          type="number"
+                          defaultValue={markupPct}
+                          onBlur={(e) => commitMarkup(key, e.target.value, wholesale)}
+                          min="0"
+                          step="1"
+                          className={`w-16 ${inputClass}`}
+                        />
+                        <span className="text-xs text-ink-muted ml-0.5">%</span>
+                      </div>
+                    </td>
+
                     <td className="px-5 py-3 text-right text-olive">{formatDollars(profitCents)}</td>
                     <td className="px-5 py-3 text-right text-ink-muted">{margin}%</td>
                   </tr>
@@ -214,19 +258,25 @@ export function PricingCostsClient({ tiers, activeSizes = [] }: Props) {
             </tbody>
           </table>
         </div>
+        <p className="text-[11px] text-ink-muted mt-2">
+          Terracotta cells have a custom global price set. Click × to revert to the engine default. Changes apply across all artworks that don't have a per-artwork override.
+        </p>
       </div>
 
-      {/* Band legend */}
-      <div className="flex gap-4 text-xs text-ink-muted">
-        {bandMarkups.map(({ band, markup, rounding }) => (
-          <span key={band} className="flex items-center gap-1.5">
-            <span className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}>
-              {BAND_LABEL[band]}
-            </span>
-            {band.charAt(0).toUpperCase() + band.slice(1)} — {markup}×
-            {rounding > 0 ? `, rounded to nearest $${rounding}` : ''}
-          </span>
-        ))}
+      {/* Save */}
+      {error && (
+        <p className="text-sm text-terracotta border border-terracotta/30 bg-terracotta/5 px-4 py-3">{error}</p>
+      )}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={handleSave}
+          disabled={isPending}
+          className="inline-flex items-center gap-2 bg-ink text-bone px-5 py-3 text-sm hover:bg-terracotta transition-colors disabled:opacity-60"
+        >
+          {isPending && <Loader2 size={12} className="animate-spin" />}
+          Save prices
+        </button>
+        {saved && <p className="text-xs text-olive">Saved.</p>}
       </div>
 
       {/* International shipping reference */}

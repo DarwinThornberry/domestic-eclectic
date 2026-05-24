@@ -8,7 +8,7 @@ const SECTIONS = [
   {
     heading: 'PRICING',
     items: [
-      { href: '/admin/settings/pricing/costs',     label: 'Print Costs' },
+      { href: '/admin/settings/pricing/costs',     label: 'Costs' },
       { href: '/admin/settings/pricing/discounts', label: 'Discounts' },
     ],
   },

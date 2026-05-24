@@ -216,6 +216,17 @@ export async function saveSettings(data: Partial<Omit<Settings, 'id' | 'updated_
   revalidatePath('/admin/settings', 'layout')
 }
 
+export async function saveGlobalPriceOverrides(overrides: Record<string, number>) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('settings')
+    .update({ global_price_overrides: overrides, updated_at: new Date().toISOString() })
+    .eq('id', 1)
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/settings/pricing/costs')
+  revalidatePath('/admin/artworks', 'layout')
+}
+
 // ─── Artwork pricing ─────────────────────────────────────────────────────────
 
 export async function saveArtworkPricing(
@@ -243,7 +254,6 @@ export async function saveArtworkPricing(
     .eq('id', artworkId)
   if (error) throw new Error(error.message)
   revalidatePath(`/admin/artworks/${artworkId}/edit`)
-  revalidatePath('/admin/settings/pricing/strategy')
 }
 
 // ─── Contact messages ─────────────────────────────────────────────────────────

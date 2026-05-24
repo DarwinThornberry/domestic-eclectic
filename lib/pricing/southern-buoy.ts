@@ -226,15 +226,16 @@ export function getWholesaleCostDollars(
 }
 
 /**
- * Returns the customer-facing price in AUD cents using the global tier markups.
+ * Returns the customer-facing price in AUD cents.
  *
  * Priority order:
- * 1. priceOverrides[combo] → exact override (ignores markup)
- * 2. fixedPrices[combo] → exact override (legacy, ignores markup)
- * 3. custom_band_markups mode + per-band markup set → apply markup + tier rounding
- * 4. custom_markup mode (legacy) → apply single markup, no rounding
- * 5. Global tier markup for the size band + rounding
- * 6. Wholesale combination unavailable → null
+ * 1. artworkOverrides.priceOverrides[combo] — per-artwork exact price
+ * 2. artworkOverrides.fixedPrices[combo]    — per-artwork exact price (legacy)
+ * 3. globalPriceOverrides[combo]            — global default from Settings > Costs
+ * 4. custom_band_markups mode               — per-artwork band markup
+ * 5. custom_markup mode (legacy)            — per-artwork single markup
+ * 6. Global tier markup for the size band + rounding (engine fallback)
+ * 7. Wholesale combination unavailable → null
  */
 export function calculatePrice(
   material: Material,
@@ -242,25 +243,31 @@ export function calculatePrice(
   framing: Framing,
   tiers: PricingTiers = DEFAULT_TIERS,
   artworkOverrides?: ArtworkPricingOverrides,
+  globalPriceOverrides?: Record<string, number> | null,
 ): number | null {
-  // Step 6: check availability
+  // Step 7: check availability
   const cost = getWholesaleCostDollars(material, size, framing)
   if (cost === null) return null
 
   const comboKey = `${material}:${size}:${framing}`
   const band = getSizeBand(size)
 
-  // Step 1: per-combo price override (new)
+  // Step 1: per-artwork exact price override
   if (artworkOverrides?.priceOverrides?.[comboKey] !== undefined) {
     return artworkOverrides.priceOverrides[comboKey]
   }
 
-  // Step 2: per-combo fixed price (legacy)
+  // Step 2: per-artwork fixed price (legacy)
   if (artworkOverrides?.fixedPrices?.[comboKey] !== undefined) {
     return artworkOverrides.fixedPrices[comboKey]
   }
 
-  // Step 3: per-band custom markup on this artwork
+  // Step 3: global default from Settings > Costs
+  if (globalPriceOverrides?.[comboKey] !== undefined) {
+    return globalPriceOverrides[comboKey]
+  }
+
+  // Step 4: per-band custom markup on this artwork
   if (artworkOverrides?.pricingMode === 'custom_band_markups') {
     const bandMarkup =
       band === 'small'  ? artworkOverrides.customMarkupSmall  :
@@ -275,12 +282,12 @@ export function calculatePrice(
     }
   }
 
-  // Step 4: legacy single custom markup (no per-band rounding for backward compat)
+  // Step 5: legacy single custom markup (no per-band rounding for backward compat)
   if (artworkOverrides?.pricingMode === 'custom_markup' && artworkOverrides.customMarkup != null) {
     return Math.round(cost * artworkOverrides.customMarkup * 100)
   }
 
-  // Step 5: global tier markup for the size band + rounding
+  // Step 6: global tier markup for the size band + rounding (engine fallback)
   const tierMarkup =
     band === 'small'  ? tiers.markupSmall  :
     band === 'medium' ? tiers.markupMedium :
@@ -309,6 +316,7 @@ export function calculatePriceForArtwork(
   artworkCustomMarkupMedium?: number | null,
   artworkCustomMarkupLarge?: number | null,
   priceOverrides?: Record<string, number> | null,
+  globalPriceOverrides?: Record<string, number> | null,
 ): number | null {
   // Accept legacy number (markup multiplier) for backward compat
   const resolvedTiers: PricingTiers =
@@ -324,7 +332,7 @@ export function calculatePriceForArtwork(
     customMarkupMedium: artworkCustomMarkupMedium,
     customMarkupLarge:  artworkCustomMarkupLarge,
     priceOverrides,
-  })
+  }, globalPriceOverrides)
 }
 
 // ─── Shipping ─────────────────────────────────────────────────────────────────
