@@ -141,11 +141,6 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
   <p style="${styles.sectionLabel}">Ship To</p>
   ${printerAddressBlock(order)}
 
-  <p style="${styles.sectionLabel}">Totals</p>
-  <p style="${styles.totalRow}">Subtotal: ${formatCents(order.subtotal_aud)}</p>
-  <p style="${styles.totalRow}">Shipping: ${formatCents(order.shipping_aud)}</p>
-  <p style="${styles.totalFinal}">Total: ${formatCents(order.total_aud)}</p>
-
   <p style="${styles.footer}">
     Questions about this order? Contact Lara Stocco at lara@domesticeclectic.com.au<br>
     Domestic Eclectic · Fine Art Prints by Lara Stocco
