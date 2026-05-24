@@ -14,8 +14,9 @@ interface Props {
 export default async function CheckoutSuccessPage({ searchParams }: Props) {
   const { session_id } = await searchParams
 
-  // Try to fetch order details from Stripe to show the order number.
-  // Falls back gracefully if Stripe isn't configured yet.
+  // Read the real order number from the DB — the Stripe webhook assigns it
+  // when payment completes. Stripe metadata only holds the placeholder used
+  // at session-creation time, so we go to the source of truth instead.
   let orderNumber: string | null = null
 
   if (session_id && process.env.STRIPE_SECRET_KEY) {
@@ -23,9 +24,25 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       const { getStripe } = await import('@/lib/stripe')
       const stripe = getStripe()
       const session = await stripe.checkout.sessions.retrieve(session_id)
-      orderNumber = session.metadata?.order_number ?? null
+      const orderId = session.metadata?.order_id
+
+      if (orderId && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        const { createClient } = await import('@/lib/supabase/server')
+        const supabase = await createClient()
+        const { data: order } = await supabase
+          .from('orders')
+          .select('order_number')
+          .eq('id', orderId)
+          .single()
+
+        const num = order?.order_number
+        // Only surface the number once the webhook has replaced the placeholder
+        if (num && !num.includes('TEMP')) {
+          orderNumber = num
+        }
+      }
     } catch {
-      // Stripe not reachable — show generic confirmation
+      // Stripe or DB not reachable — show generic confirmation without number
     }
   }
 

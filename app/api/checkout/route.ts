@@ -176,9 +176,6 @@ export async function POST(request: NextRequest) {
           (artworkRows ?? []).map((r: { slug: string; id: string }) => [r.slug, r.id]),
         )
 
-        const { data: numData } = await supabase.rpc('generate_order_number')
-        if (numData) orderNumber = numData as string
-
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
@@ -291,7 +288,6 @@ export async function POST(request: NextRequest) {
       },
       metadata: {
         order_id: orderId,
-        order_number: orderNumber,
         discount_id: discountData?.id ?? '',
         discount_code: discountData?.code ?? '',
         discount_aud: String(discountAud),

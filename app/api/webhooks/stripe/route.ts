@@ -46,13 +46,31 @@ export async function POST(request: NextRequest) {
       // Stripe may deliver the same event more than once — only process once.
       const { data: existingOrder } = await supabase
         .from('orders')
-        .select('id, status')
+        .select('id, status, order_number')
         .eq('id', orderId)
         .single()
 
       if (existingOrder?.status === 'paid') {
         console.log(`[webhook] Order ${orderId} already marked paid — skipping`)
         return NextResponse.json({ received: true })
+      }
+
+      // ── Assign real order number ──────────────────────────────────────────
+      // The checkout route creates the order with a TEMP placeholder so that
+      // abandoned checkouts don't consume sequential numbers. We assign the
+      // real DE-XXXX number here, once payment is confirmed.
+      let realOrderNumber: string | undefined
+      if (existingOrder?.order_number?.includes('TEMP')) {
+        try {
+          const { data: numData, error: rpcError } = await supabase.rpc('generate_order_number')
+          if (rpcError) throw rpcError
+          if (numData) realOrderNumber = numData as string
+        } catch (err) {
+          console.error(
+            '[webhook] CRITICAL: generate_order_number() failed — order will keep placeholder number. Manual intervention required.',
+            err,
+          )
+        }
       }
 
       // ── Update order ──────────────────────────────────────────────────────
@@ -63,6 +81,7 @@ export async function POST(request: NextRequest) {
         .from('orders')
         .update({
           status: 'paid',
+          ...(realOrderNumber ? { order_number: realOrderNumber } : {}),
           stripe_payment_intent: session.payment_intent as string,
           customer_email: customer?.email ?? '',
           customer_name: customer?.name ?? shipping?.name ?? '',
