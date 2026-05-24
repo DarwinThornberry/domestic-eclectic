@@ -16,7 +16,6 @@ interface ArtworkData {
   description?: string
   original_dims?: string
   thumbnail_url?: string | null
-  hi_res_file_url?: string | null
   gallery_images?: string[]
   is_published?: boolean
   aspect_ratio?: number | null
@@ -73,7 +72,6 @@ export function ArtworkForm({ artwork }: Props) {
     slug: artwork?.slug ?? '',
     is_published: artwork?.is_published ?? false,
     thumbnail_url: artwork?.thumbnail_url ?? '',
-    hi_res_file_url: artwork?.hi_res_file_url ?? '',
     gallery_images: artwork?.gallery_images ?? [],
   })
 
@@ -219,18 +217,6 @@ export function ArtworkForm({ artwork }: Props) {
           showPreview
           onUpload={(url) => set('thumbnail_url', url)}
           initialUrl={form.thumbnail_url || null}
-        />
-
-        {/* Print file */}
-        <ImageUpload
-          label="Print file"
-          helpText="The high-resolution file that will be sent to Southern Buoy for printing. This should be your TIFF reproduction file. Customers never see this — it's only used for printing."
-          bucket="artwork-hires"
-          accept="image/tiff,image/tif,image/jpeg,image/png"
-          maxMB={500}
-          showPreview={false}
-          onUpload={(url) => set('hi_res_file_url', url)}
-          initialUrl={form.hi_res_file_url || null}
         />
 
         {/* Gallery images */}

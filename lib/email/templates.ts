@@ -114,7 +114,7 @@ function printerAddressBlock(order: OrderWithItems): string {
   `
 }
 
-export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): string {
+export function printerEmailHtml(order: OrderWithItems): string {
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Print Order — ${order.order_number}</title></head>
 <body style="${styles.body}">
@@ -128,15 +128,6 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
 
   <p style="${styles.sectionLabel}">Items</p>
   ${printerItemsBlock(order)}
-
-  ${printFileUrl ? `
-  <p style="${styles.sectionLabel}">Print File</p>
-  <p style="${styles.small}">The high-resolution print file is available for download below. This link expires in 30 days.</p>
-  <a href="${printFileUrl}" style="${styles.btn}">Download print file</a>
-  ` : `
-  <p style="${styles.sectionLabel}">Print File</p>
-  <p style="${styles.small}">The print file will be sent separately or is already on file.</p>
-  `}
 
   <p style="${styles.sectionLabel}">Ship To</p>
   ${printerAddressBlock(order)}

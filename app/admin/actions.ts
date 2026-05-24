@@ -62,26 +62,14 @@ export async function sendToPrinter(orderId: string) {
   // Fetch full order with items for the email
   const { data: order, error } = await supabase
     .from('orders')
-    .select(`*, order_items(*, artworks(slug, thumbnail_url, hi_res_file_url))`)
+    .select(`*, order_items(*, artworks(slug, thumbnail_url))`)
     .eq('id', orderId)
     .single()
 
   if (error || !order) throw new Error('Order not found')
 
-  // Generate signed URL for the first artwork's print file (if available)
-  let printFileUrl: string | undefined
-  const firstItem = order.order_items?.[0]
-  const hiResPath = firstItem?.artworks?.hi_res_file_url
-  if (hiResPath) {
-    const { data } = await supabase.storage
-      .from('artwork-hires')
-      .createSignedUrl(hiResPath, 60 * 60 * 24 * 30) // 30 days
-    printFileUrl = data?.signedUrl
-  }
-
-  // Send the email
   const { sendPrinterEmail } = await import('@/lib/email')
-  await sendPrinterEmail(order as any, printFileUrl)
+  await sendPrinterEmail(order as any)
 
   await updateOrderStatus(orderId, 'sent_to_printer')
 }
@@ -133,7 +121,7 @@ export async function deleteArtwork(artworkId: string): Promise<string> {
 
   const { data: artwork, error: fetchError } = await supabase
     .from('artworks')
-    .select('title, thumbnail_url, gallery_images, hi_res_file_url')
+    .select('title, thumbnail_url, gallery_images')
     .eq('id', artworkId)
     .single()
 
@@ -163,17 +151,6 @@ export async function deleteArtwork(artworkId: string): Promise<string> {
     }
   } catch (e) {
     console.error('[deleteArtwork] public storage error:', e)
-  }
-
-  try {
-    if (artwork.hi_res_file_url) {
-      const { error } = await supabase.storage
-        .from('artwork-hires')
-        .remove([artwork.hi_res_file_url])
-      if (error) console.error('[deleteArtwork] hires deletion failed:', error.message)
-    }
-  } catch (e) {
-    console.error('[deleteArtwork] hires storage error:', e)
   }
 
   const { error } = await supabase.from('artworks').delete().eq('id', artworkId)

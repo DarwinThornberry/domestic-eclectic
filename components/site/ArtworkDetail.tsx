@@ -46,6 +46,9 @@ export function ArtworkDetail({
 }) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [activeFraming, setActiveFraming] = useState<Framing | null>(null)
+  const [activeImage, setActiveImage] = useState<string | undefined>(artwork.heroImage)
+
+  const allImages = [artwork.heroImage, ...artwork.galleryImages].filter(Boolean) as string[]
 
   return (
     <>
@@ -77,13 +80,13 @@ export function ArtworkDetail({
                 boxShadow: getFrameBoxShadow(activeFraming),
                 transition: 'box-shadow 0.35s ease',
               }}
-              onClick={() => artwork.heroImage && setLightboxOpen(true)}
+              onClick={() => activeImage && setLightboxOpen(true)}
               aria-label="Click to zoom"
             >
-              {artwork.heroImage ? (
+              {activeImage ? (
                 <div className="absolute inset-0">
                   <Image
-                    src={artwork.heroImage}
+                    src={activeImage}
                     alt={artwork.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 60vw"
@@ -105,7 +108,7 @@ export function ArtworkDetail({
                 </div>
               )}
 
-              {artwork.heroImage && (
+              {activeImage && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors duration-300">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-canvas/90 px-4 py-2 flex items-center gap-2">
                     <ZoomIn size={14} style={{ color: '#1A1814' }} />
@@ -123,16 +126,22 @@ export function ArtworkDetail({
               </p>
             )}
 
-            {artwork.galleryImages.length > 0 && (
+            {allImages.length > 1 && (
               <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
-                {artwork.galleryImages.map((img, i) => (
-                  <div
+                {allImages.map((img, i) => (
+                  <button
                     key={i}
-                    className="relative shrink-0 w-20 h-20 border border-border overflow-hidden bg-canvas cursor-pointer hover:border-ink transition-colors"
+                    onClick={() => setActiveImage(img)}
+                    aria-label={`View image ${i + 1}`}
+                    className={`relative shrink-0 w-20 h-20 border overflow-hidden bg-canvas transition-colors focus:outline-none ${
+                      img === activeImage
+                        ? 'border-ink'
+                        : 'border-border hover:border-ink-muted'
+                    }`}
                   >
                     <Image
                       src={img}
-                      alt={`${artwork.title} detail ${i + 1}`}
+                      alt={`${artwork.title} view ${i + 1}`}
                       fill
                       sizes="80px"
                       className="object-cover select-none artwork-img"
@@ -140,7 +149,7 @@ export function ArtworkDetail({
                       draggable={false}
                     />
                     <ArtworkMonogram />
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
@@ -183,9 +192,9 @@ export function ArtworkDetail({
         </div>
       </div>
 
-      {lightboxOpen && artwork.heroImage && (
+      {lightboxOpen && activeImage && (
         <Lightbox
-          src={artwork.heroImage}
+          src={activeImage}
           alt={artwork.title}
           onClose={() => setLightboxOpen(false)}
         />

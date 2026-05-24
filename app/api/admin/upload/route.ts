@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/server'
 
 const ALLOWED_PUBLIC_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
-const ALLOWED_HIRES_TYPES = ['image/tiff', 'image/tif', 'image/jpeg', 'image/png']
 
 export const dynamic = 'force-dynamic'
 
@@ -23,14 +22,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing file or bucket' }, { status: 400 })
   }
 
-  if (!['artwork-public', 'artwork-hires'].includes(bucket)) {
+  if (bucket !== 'artwork-public') {
     return NextResponse.json({ error: 'Invalid bucket' }, { status: 400 })
   }
 
-  const allowed = bucket === 'artwork-public' ? ALLOWED_PUBLIC_TYPES : ALLOWED_HIRES_TYPES
-  if (!allowed.includes(file.type)) {
+  if (!ALLOWED_PUBLIC_TYPES.includes(file.type)) {
     return NextResponse.json(
-      { error: `File type not allowed. Use: ${allowed.join(', ')}` },
+      { error: `File type not allowed. Use: ${ALLOWED_PUBLIC_TYPES.join(', ')}` },
       { status: 400 },
     )
   }
@@ -57,11 +55,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 })
   }
 
-  if (bucket === 'artwork-public') {
-    const { data } = adminSupabase.storage.from(bucket).getPublicUrl(path)
-    return NextResponse.json({ url: data.publicUrl, path })
-  } else {
-    // For private bucket, return just the path — signed URLs are generated on demand
-    return NextResponse.json({ url: path, path })
-  }
+  const { data } = adminSupabase.storage.from(bucket).getPublicUrl(path)
+  return NextResponse.json({ url: data.publicUrl, path })
 }

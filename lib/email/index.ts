@@ -24,7 +24,7 @@ const FROM_ADDRESS = process.env.EMAIL_FROM ?? 'Domestic Eclectic <studio@domest
 // ── Contact form ──────────────────────────────────────────────────────────────
 export const CONTACT_ADMIN_EMAIL = 'lara@domesticeclectic.com.au'
 
-export async function sendPrinterEmail(order: OrderWithItems, printFileUrl?: string) {
+export async function sendPrinterEmail(order: OrderWithItems) {
   const resend = getResend()
   const printerEmail = process.env.PRINTER_EMAIL ?? 'southernbuoy@gmail.com'
 
@@ -32,7 +32,7 @@ export async function sendPrinterEmail(order: OrderWithItems, printFileUrl?: str
     from: FROM_ADDRESS,
     to: printerEmail,
     subject: `New Drop Ship Order — Domestic Eclectic — ${order.order_number}`,
-    html: printerEmailHtml(order, printFileUrl),
+    html: printerEmailHtml(order),
   })
 }
 
