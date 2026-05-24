@@ -5,6 +5,8 @@ import {
   customerConfirmationHtml,
   adminNotificationHtml,
   shippedNotificationHtml,
+  contactConfirmationHtml,
+  contactNotificationHtml,
 } from './templates'
 
 let _resend: Resend | null = null
@@ -18,6 +20,9 @@ function getResend(): Resend {
 }
 
 const FROM_ADDRESS = process.env.EMAIL_FROM ?? 'Domestic Eclectic <studio@domesticeclectic.com.au>'
+
+// ── Contact form ──────────────────────────────────────────────────────────────
+export const CONTACT_ADMIN_EMAIL = 'lara@domesticeclectic.com.au'
 
 export async function sendPrinterEmail(order: OrderWithItems, printFileUrl?: string) {
   const resend = getResend()
@@ -65,6 +70,27 @@ export async function sendShippedEmail(order: OrderWithItems, trackingNumber?: s
     to: order.customer_email,
     subject: `Your order is on its way — ${order.order_number}`,
     html: shippedNotificationHtml(order, trackingNumber),
+  })
+}
+
+export async function sendContactConfirmation(name: string, senderEmail: string) {
+  const resend = getResend()
+  await resend.emails.send({
+    from: FROM_ADDRESS,
+    to: senderEmail,
+    subject: 'Message received — Domestic Eclectic',
+    html: contactConfirmationHtml(name),
+  })
+}
+
+export async function sendContactNotification(name: string, senderEmail: string, message: string) {
+  const resend = getResend()
+  await resend.emails.send({
+    from: FROM_ADDRESS,
+    to: CONTACT_ADMIN_EMAIL,
+    reply_to: senderEmail,
+    subject: `New message from ${name}`,
+    html: contactNotificationHtml(name, senderEmail, message),
   })
 }
 

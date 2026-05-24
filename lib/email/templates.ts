@@ -204,6 +204,53 @@ export function adminNotificationHtml(order: OrderWithItems, siteUrl: string): s
 </body></html>`
 }
 
+// ─── Contact form emails ──────────────────────────────────────────────────────
+
+export function contactConfirmationHtml(name: string): string {
+  const firstName = name.split(' ')[0]
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Message received — Domestic Eclectic</title></head>
+<body style="${styles.body}">
+<div style="${styles.wrap}">
+  ${wordmark()}
+  <h2 style="${styles.h2}">Thank you, ${firstName}.</h2>
+  <p style="${styles.lead}">Your message has been received. Lara will get back to you shortly.</p>
+
+  <p style="${styles.footer}">
+    Domestic Eclectic · Fine Art Prints by Lara Stocco<br>
+    <a href="https://domesticeclectic.com.au" style="color: #9A6B4F; text-decoration: none;">domesticeclectic.com.au</a>
+  </p>
+</div>
+</body></html>`
+}
+
+export function contactNotificationHtml(name: string, senderEmail: string, message: string): string {
+  const escapedMessage = message
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>New message — ${name}</title></head>
+<body style="${styles.body}">
+<div style="${styles.wrap}">
+  ${wordmark()}
+  <h2 style="${styles.h2}">New message received.</h2>
+
+  <p style="${styles.sectionLabel}">From</p>
+  <p style="${styles.small}"><strong>${name}</strong> &middot; <a href="mailto:${senderEmail}" style="color: #9A6B4F;">${senderEmail}</a></p>
+
+  <p style="${styles.sectionLabel}">Message</p>
+  <p style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; line-height: 1.7; margin: 0; padding: 18px 20px; background: #EAE0CC; border-left: 4px solid #9A6B4F;">${escapedMessage}</p>
+
+  <p style="${styles.footer}">
+    Reply directly to <a href="mailto:${senderEmail}" style="color: #9A6B4F;">${senderEmail}</a> to respond.<br>
+    Domestic Eclectic Studio
+  </p>
+</div>
+</body></html>`
+}
+
 export function shippedNotificationHtml(order: OrderWithItems, trackingNumber?: string): string {
   const firstName = order.customer_name.split(' ')[0]
 
