@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2, ArrowLeft } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { Nav } from '@/components/site/Nav'
+import { requestPasswordReset } from './actions'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -18,12 +18,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-      })
-      if (error) throw error
+      await requestPasswordReset(email)
       setSent(true)
     } catch {
       setError('Something went wrong. Please check the email address and try again.')
