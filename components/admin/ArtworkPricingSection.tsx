@@ -36,18 +36,6 @@ const BAND_COLOUR: Record<string, string> = {
   large:  'bg-ink/10 text-ink-muted',
 }
 
-interface Props {
-  artworkId: string
-  initialPricingMode: PricingMode
-  initialCustomMarkup: number | null
-  initialCustomMarkupSmall: number | null
-  initialCustomMarkupMedium: number | null
-  initialCustomMarkupLarge: number | null
-  initialFixedPrices: Record<string, number> | null
-  initialPriceOverrides: Record<string, number> | null
-  tiers: PricingTiers
-}
-
 // ─── View pricing modal ───────────────────────────────────────────────────────
 
 function ViewPricingModal({
