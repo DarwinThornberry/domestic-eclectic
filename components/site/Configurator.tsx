@@ -85,6 +85,7 @@ interface Props {
   artwork: ArtworkData
   tiers: PricingTiers
   globalPriceOverrides: Record<string, number>
+  onFramingChange?: (framing: Framing | null) => void
 }
 
 type FramingCategory = 'unframed' | 'standard' | 'premium'
@@ -97,7 +98,7 @@ interface Config {
   quantity: number
 }
 
-export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
+export function Configurator({ artwork, tiers, globalPriceOverrides, onFramingChange }: Props) {
   const { addItem } = useCart()
 
   const [config, setConfig] = useState<Config>({
@@ -132,6 +133,9 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
     if (!colour) return null
     return colour as Framing
   }, [config.framingCategory, config.frameColour])
+
+  // ── Broadcast framing to parent ────────────────────────────────────────────
+  useEffect(() => { onFramingChange?.(framing) }, [framing, onFramingChange])
 
   // ── Live price ──────────────────────────────────────────────────────────────
   const price = useMemo(() => {

@@ -9,6 +9,31 @@ import { ArtworkMonogram } from '@/components/ui/ArtworkMonogram'
 import { Configurator } from '@/components/site/Configurator'
 import type { ArtworkData } from '@/lib/data/artworks'
 import type { PricingTiers } from '@/lib/pricing/southern-buoy'
+import type { Framing } from '@/types'
+
+// ─── Frame preview ────────────────────────────────────────────────────────────
+
+const FRAME_COLOURS: Record<string, string> = {
+  standard_flooded_gum:  '#8B6355',
+  standard_american_ash: '#C4B49A',
+  premium_white:         '#E6E0D8',
+  premium_mahogany:      '#5E3922',
+  premium_walnut:        '#4A3728',
+  premium_black:         '#1C1A16',
+}
+
+function getFrameBoxShadow(framing: Framing | null): string {
+  const base = '0 8px 40px rgba(0,0,0,0.35)'
+  if (!framing || framing === 'unframed') return base
+  const color = FRAME_COLOURS[framing]
+  if (!color) return base
+  return [
+    '0 0 0 6px rgba(0,0,0,0.20)',
+    `0 0 0 28px ${color}`,
+    '0 0 0 31px rgba(0,0,0,0.30)',
+    '0 16px 60px rgba(0,0,0,0.55)',
+  ].join(', ')
+}
 
 export function ArtworkDetail({
   artwork,
@@ -20,6 +45,7 @@ export function ArtworkDetail({
   globalPriceOverrides: Record<string, number>
 }) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [activeFraming, setActiveFraming] = useState<Framing | null>(null)
 
   return (
     <>
@@ -38,11 +64,18 @@ export function ArtworkDetail({
 
           {/* Left: artwork image */}
           <div>
+            <div
+              style={{
+                padding: activeFraming && activeFraming !== 'unframed' ? '40px' : '0',
+                transition: 'padding 0.35s ease',
+              }}
+            >
             <button
               className="group relative w-full overflow-hidden border border-border bg-canvas focus:outline-none focus-visible:ring-1 focus-visible:ring-terracotta"
               style={{
                 aspectRatio: String(artwork.aspectRatio),
-                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.35)',
+                boxShadow: getFrameBoxShadow(activeFraming),
+                transition: 'box-shadow 0.35s ease',
               }}
               onClick={() => artwork.heroImage && setLightboxOpen(true)}
               aria-label="Click to zoom"
@@ -82,6 +115,14 @@ export function ArtworkDetail({
               )}
             </button>
 
+            </div>
+
+            {activeFraming && activeFraming !== 'unframed' && (
+              <p className="text-xs text-ink/50 mt-3 text-center tracking-wide">
+                Frame shown is a guide.
+              </p>
+            )}
+
             {artwork.galleryImages.length > 0 && (
               <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
                 {artwork.galleryImages.map((img, i) => (
@@ -107,7 +148,7 @@ export function ArtworkDetail({
 
           {/* Right: configurator */}
           <div className="lg:sticky lg:top-8 lg:self-start">
-            <Configurator artwork={artwork} tiers={tiers} globalPriceOverrides={globalPriceOverrides} />
+            <Configurator artwork={artwork} tiers={tiers} globalPriceOverrides={globalPriceOverrides} onFramingChange={setActiveFraming} />
           </div>
         </div>
 

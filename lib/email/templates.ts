@@ -151,7 +151,6 @@ export function printerEmailHtml(order: OrderWithItems, printFileUrl?: string): 
 
 export function customerConfirmationHtml(order: OrderWithItems): string {
   const firstName = order.customer_name.split(' ')[0]
-  const gstCents = Math.round(order.total_aud / 11)
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Order confirmed — ${order.order_number}</title></head>
@@ -171,7 +170,6 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
   <p style="${styles.totalRow}">Subtotal: ${formatCents(order.subtotal_aud)}</p>
   <p style="${styles.totalRow}">Shipping: ${formatCents(order.shipping_aud)}</p>
   <p style="${styles.totalFinal}">Total: ${formatCents(order.total_aud)}</p>
-  <p style="${styles.totalGst}">Includes GST: ${formatCents(gstCents)}</p>
 
   <p style="${styles.sectionLabel}">What happens next</p>
   <p style="${styles.small}">Your print will be produced on archival materials by Southern Buoy in Mornington, Victoria. Australian orders typically arrive within 7–14 business days of dispatch. You'll receive a shipping notification once your order leaves the studio.</p>
@@ -179,7 +177,8 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
 
   <p style="${styles.footer}">
     Domestic Eclectic · Fine Art Prints by Lara Stocco<br>
-    Printed and fulfilled by Southern Buoy, Mornington VIC
+    Printed and fulfilled by Southern Buoy, Mornington VIC<br>
+    ABN: 54 728 864 878
   </p>
 </div>
 </body></html>`
