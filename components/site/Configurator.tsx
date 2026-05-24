@@ -230,11 +230,11 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
                     : 'border-border hover:border-ink-muted'
                 }`}
               >
-                <p className={`font-display italic text-base leading-tight mb-0.5 ${selected ? 'text-ink' : 'text-ink-muted'}`}>
+                <p className={`font-display italic text-base leading-tight mb-0.5 ${selected ? 'text-ink' : 'text-ink/75'}`}>
                   {m.name}
                 </p>
-                <p className="caption text-ink-muted text-[11px] mb-2">{m.subtitle}</p>
-                <p className="text-xs text-ink-muted leading-snug">{m.description}</p>
+                <p className="text-xs text-ink/60 tracking-wider uppercase mb-2">{m.subtitle}</p>
+                <p className="text-sm text-ink/75 leading-snug">{m.description}</p>
                 {selected && (
                   <div className="mt-2 flex justify-end">
                     <Check size={13} className="text-terracotta" />
@@ -263,7 +263,7 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
                 : 'border-ink/[0.25] bg-ink/[0.04] opacity-40 cursor-not-allowed'
             }`}
           >
-            <span className={selectedSizeLabel ? 'text-ink' : 'text-ink-muted'}>
+            <span className={selectedSizeLabel ? 'text-ink' : 'text-ink/70'}>
               {selectedSizeLabel ?? (config.material ? 'Select a size' : 'Select a material first')}
             </span>
             <ChevronDown
@@ -321,7 +321,7 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
             </div>
           )}
         </div>
-        <p className="text-xs text-ink-muted leading-relaxed mt-3">
+        <p className="text-sm text-ink/70 leading-relaxed mt-3">
           All sizes are offered in the same proportions as the original artwork — your print is never cropped or distorted.
         </p>
       </div>
@@ -348,10 +348,10 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
                   selected ? 'border-ink bg-ink/[0.03]' : 'border-border hover:border-ink-muted'
                 }`}
               >
-                <p className={`text-sm font-medium leading-tight ${selected ? 'text-ink' : 'text-ink-muted'}`}>
+                <p className={`text-sm font-medium leading-tight ${selected ? 'text-ink' : 'text-ink/75'}`}>
                   {label}
                 </p>
-                <p className="text-[11px] text-ink-muted mt-0.5 leading-snug">{sub}</p>
+                <p className="text-xs text-ink/65 mt-0.5 leading-snug">{sub}</p>
               </button>
             )
           })}
@@ -360,7 +360,7 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
         {/* Colour sub-selector */}
         {config.framingCategory === 'standard' && (
           <div>
-            <p className="text-xs text-ink-muted mb-3">Frame colour</p>
+            <p className="text-sm text-ink/70 mb-3">Frame colour</p>
             <div className="flex flex-wrap gap-2">
               {STANDARD_COLOURS.map(({ key: swatchKey, ...rest }) => (
                 <ColourSwatch
@@ -376,7 +376,7 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
 
         {config.framingCategory === 'premium' && (
           <div>
-            <p className="text-xs text-ink-muted mb-3">Frame colour (premium finish)</p>
+            <p className="text-sm text-ink/70 mb-3">Frame colour (premium finish)</p>
             <div className="flex flex-wrap gap-2">
               {PREMIUM_COLOURS.map(({ key: swatchKey, ...rest }) => (
                 <ColourSwatch
@@ -422,7 +422,7 @@ export function Configurator({ artwork, tiers, globalPriceOverrides }: Props) {
               <p className="font-display text-4xl italic text-ink">
                 {formatPrice(price * config.quantity)}
               </p>
-              <p className="text-xs text-ink-muted mt-1">
+              <p className="text-sm text-ink/70 mt-1">
                 incl. printing & framing · shipping calculated at checkout
               </p>
             </>
@@ -483,7 +483,7 @@ function ColourSwatch({
         }`}
         style={{ backgroundColor: hex }}
       />
-      <p className={`text-[10px] leading-none ${selected ? 'text-ink' : 'text-ink-muted'}`}>
+      <p className={`text-xs leading-none ${selected ? 'text-ink' : 'text-ink/70'}`}>
         {label.split(' ').pop()}
       </p>
     </button>

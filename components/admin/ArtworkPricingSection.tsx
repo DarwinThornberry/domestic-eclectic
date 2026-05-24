@@ -169,10 +169,12 @@ export function ArtworkPricingSection({
     ? ALL_SIZES.filter((s) => allowedSizes.includes(s.key))
     : ALL_SIZES
 
-  function setOverridePrice(key: string, dollars: string) {
+  function commitPrice(key: string, dollars: string) {
     const cents = Math.round(parseFloat(dollars) * 100)
-    setOverrides((prev) => ({ ...prev, [key]: isNaN(cents) ? 0 : cents }))
-    setSaved(false)
+    if (!isNaN(cents) && cents >= 0) {
+      setOverrides((prev) => ({ ...prev, [key]: cents }))
+      setSaved(false)
+    }
   }
 
   function resetOverride(key: string) {
@@ -256,19 +258,20 @@ export function ArtworkPricingSection({
                           }
                           const defaultPrice = calculatePrice(mat as Material, size.key, framing as Framing, tiers)!
                           const hasOverride = overrides[key] !== undefined
-                          const displayVal = hasOverride
-                            ? (overrides[key] / 100).toFixed(2)
-                            : (defaultPrice / 100).toFixed(2)
+                          const priceCents = hasOverride ? overrides[key] : defaultPrice
+                          const displayVal = (priceCents / 100).toFixed(2)
+                          const inputKey = `${key}:${priceCents}`
                           return (
                             <td key={framing} className="px-3 py-2 text-right">
                               <div className="flex items-center justify-end gap-1">
                                 <span className="text-ink-muted">$</span>
                                 <input
+                                  key={inputKey}
                                   type="number"
-                                  value={displayVal}
-                                  onChange={(e) => setOverridePrice(key, e.target.value)}
+                                  defaultValue={displayVal}
+                                  onBlur={(e) => commitPrice(key, e.target.value)}
                                   min="0"
-                                  step="1"
+                                  step="0.01"
                                   className={`w-20 border bg-transparent px-2 py-1 text-xs text-right focus:outline-none focus:border-ink transition-colors ${
                                     hasOverride ? 'border-terracotta text-ink' : 'border-border text-ink-muted'
                                   }`}
