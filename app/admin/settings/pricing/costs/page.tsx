@@ -7,25 +7,38 @@ export const metadata = { title: 'Print Costs' }
 
 export default async function PrintCostsPage() {
   let tiers: PricingTiers = DEFAULT_TIERS
+  let activeSizes: string[] = []
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const supabase = createAdminClient()
-    const { data } = await supabase
-      .from('settings')
-      .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large')
-      .eq('id', 1)
-      .single()
 
-    if (data) {
+    const [{ data: settings }, { data: artworksData }] = await Promise.all([
+      supabase
+        .from('settings')
+        .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large')
+        .eq('id', 1)
+        .single(),
+      supabase
+        .from('artworks')
+        .select('allowed_sizes'),
+    ])
+
+    if (settings) {
       tiers = {
-        markupSmall:    Number(data.markup_small)    || DEFAULT_TIERS.markupSmall,
-        markupMedium:   Number(data.markup_medium)   || DEFAULT_TIERS.markupMedium,
-        markupLarge:    Number(data.markup_large)    || DEFAULT_TIERS.markupLarge,
-        roundingSmall:  Number(data.rounding_small)  ?? DEFAULT_TIERS.roundingSmall,
-        roundingMedium: Number(data.rounding_medium) ?? DEFAULT_TIERS.roundingMedium,
-        roundingLarge:  Number(data.rounding_large)  ?? DEFAULT_TIERS.roundingLarge,
+        markupSmall:    Number(settings.markup_small)    || DEFAULT_TIERS.markupSmall,
+        markupMedium:   Number(settings.markup_medium)   || DEFAULT_TIERS.markupMedium,
+        markupLarge:    Number(settings.markup_large)    || DEFAULT_TIERS.markupLarge,
+        roundingSmall:  Number(settings.rounding_small)  ?? DEFAULT_TIERS.roundingSmall,
+        roundingMedium: Number(settings.rounding_medium) ?? DEFAULT_TIERS.roundingMedium,
+        roundingLarge:  Number(settings.rounding_large)  ?? DEFAULT_TIERS.roundingLarge,
       }
     }
+
+    activeSizes = [
+      ...new Set(
+        (artworksData ?? []).flatMap((a: any) => a.allowed_sizes ?? [])
+      ),
+    ] as string[]
   }
 
   return (
@@ -37,7 +50,7 @@ export default async function PrintCostsPage() {
           Your wholesale costs from Southern Buoy and your customer prices.
         </p>
       </div>
-      <PricingCostsClient tiers={tiers} />
+      <PricingCostsClient tiers={tiers} activeSizes={activeSizes} />
     </div>
   )
 }

@@ -16,6 +16,9 @@ const STATUS_FILTERS: { value: string; label: string }[] = [
   { value: 'refunded',         label: 'Refunded' },
 ]
 
+// Shown separately — incomplete checkouts that never reached payment
+const INCOMPLETE_FILTER = { value: 'pending', label: 'Incomplete' }
+
 
 function formatCents(cents: number): string {
   return `$${(cents / 100).toLocaleString('en-AU', { minimumFractionDigits: 2 })}`
@@ -59,7 +62,11 @@ export default async function OrdersPage({ searchParams }: Props) {
       .order('created_at', { ascending: false })
       .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
 
-    if (filter !== 'all') query = query.eq('status', filter as OrderStatus)
+    if (filter === 'all') {
+      query = query.neq('status', 'pending')
+    } else {
+      query = query.eq('status', filter as OrderStatus)
+    }
 
     const since = getDateFilter(date)
     if (since) query = query.gte('created_at', since)
@@ -90,7 +97,7 @@ export default async function OrdersPage({ searchParams }: Props) {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         {/* Status filter */}
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           {STATUS_FILTERS.map((f) => (
             <Link
               key={f.value}
@@ -104,6 +111,17 @@ export default async function OrdersPage({ searchParams }: Props) {
               {f.label}
             </Link>
           ))}
+          <span className="text-border text-xs px-1 select-none">·</span>
+          <Link
+            href={buildUrl({ filter: INCOMPLETE_FILTER.value, page: '1' })}
+            className={`px-3 py-1.5 text-xs border transition-colors ${
+              filter === INCOMPLETE_FILTER.value
+                ? 'bg-ink text-bone border-ink'
+                : 'border-border border-dashed text-ink-muted hover:border-ink hover:text-ink'
+            }`}
+          >
+            {INCOMPLETE_FILTER.label}
+          </Link>
         </div>
 
         {/* Date + search (client component — needs onChange) */}

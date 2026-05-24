@@ -9,14 +9,26 @@ export default async function PricingStrategyPage() {
   let tiers: PricingTiers = DEFAULT_TIERS
   let customPricingArtworks: any[] = []
 
+  let activeSizes: string[] = []
+
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const supabase = createAdminClient()
 
-    const { data: settings } = await supabase
-      .from('settings')
-      .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large')
-      .eq('id', 1)
-      .single()
+    const [{ data: settings }, { data: artworks }, { data: artworksData }] = await Promise.all([
+      supabase
+        .from('settings')
+        .select('markup_small, markup_medium, markup_large, rounding_small, rounding_medium, rounding_large')
+        .eq('id', 1)
+        .single(),
+      supabase
+        .from('artworks')
+        .select('id, title, pricing_mode, custom_markup, custom_markup_small, custom_markup_medium, custom_markup_large')
+        .neq('pricing_mode', 'default')
+        .order('title'),
+      supabase
+        .from('artworks')
+        .select('allowed_sizes'),
+    ])
 
     if (settings) {
       tiers = {
@@ -29,13 +41,13 @@ export default async function PricingStrategyPage() {
       }
     }
 
-    const { data: artworks } = await supabase
-      .from('artworks')
-      .select('id, title, pricing_mode, custom_markup, custom_markup_small, custom_markup_medium, custom_markup_large')
-      .neq('pricing_mode', 'default')
-      .order('title')
-
     customPricingArtworks = artworks ?? []
+
+    activeSizes = [
+      ...new Set(
+        (artworksData ?? []).flatMap((a: any) => a.allowed_sizes ?? [])
+      ),
+    ] as string[]
   }
 
   return (
@@ -48,6 +60,7 @@ export default async function PricingStrategyPage() {
       <PricingStrategyClient
         initialTiers={tiers}
         customPricingArtworks={customPricingArtworks}
+        activeSizes={activeSizes}
       />
     </div>
   )

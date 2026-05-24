@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { Loader2, ExternalLink } from 'lucide-react'
 import { saveSettings } from '@/app/admin/actions'
-import { formatDollars, type PricingTiers } from '@/lib/pricing/southern-buoy'
+import { formatDollars, SIZE_BAND_MAP, type PricingTiers } from '@/lib/pricing/southern-buoy'
+import { SIZE_LABELS } from '@/lib/constants'
 
 const ROUNDING_OPTIONS = [
   { value: 0,  label: 'No rounding' },
@@ -26,6 +27,7 @@ interface CustomPricingArtwork {
 interface Props {
   initialTiers: PricingTiers
   customPricingArtworks: CustomPricingArtwork[]
+  activeSizes?: string[]
 }
 
 function BandInput({
@@ -117,7 +119,7 @@ function BandInput({
   )
 }
 
-export function PricingStrategyClient({ initialTiers, customPricingArtworks }: Props) {
+export function PricingStrategyClient({ initialTiers, customPricingArtworks, activeSizes = [] }: Props) {
   const [markupSmall,    setMarkupSmall]    = useState(String(initialTiers.markupSmall))
   const [markupMedium,   setMarkupMedium]   = useState(String(initialTiers.markupMedium))
   const [markupLarge,    setMarkupLarge]    = useState(String(initialTiers.markupLarge))
@@ -203,6 +205,36 @@ export function PricingStrategyClient({ initialTiers, customPricingArtworks }: P
             onRoundingChange={(v) => { setRoundingLarge(v); onChange() }}
           />
         </div>
+
+        {activeSizes.length > 0 && (
+          <div className="border border-border bg-bone-dark px-5 py-4 max-w-2xl mt-2">
+            <p className="text-xs text-ink-muted mb-3 tracking-wide uppercase font-normal caption">
+              Active sizes by band
+            </p>
+            <div className="flex flex-col gap-2">
+              {(['small', 'medium', 'large'] as const).map((band) => {
+                const bandSizes = activeSizes.filter((s) => SIZE_BAND_MAP[s] === band)
+                return (
+                  <div key={band} className="flex items-start gap-2.5 text-xs">
+                    <span className={`caption text-[9px] px-1.5 py-0.5 shrink-0 mt-0.5 ${
+                      band === 'small'  ? 'bg-terracotta/10 text-terracotta' :
+                      band === 'medium' ? 'bg-olive/10 text-olive' :
+                                          'bg-ink/10 text-ink-muted'
+                    }`}>
+                      {band.toUpperCase()}
+                    </span>
+                    <span className="text-ink-muted">
+                      {bandSizes.length
+                        ? bandSizes.map((s) => SIZE_LABELS[s] ?? s).join(' · ')
+                        : <em className="not-italic text-ink-muted opacity-50">none</em>
+                      }
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {error && (
           <p className="text-sm text-terracotta border border-terracotta/30 bg-terracotta/5 px-4 py-3 mt-4 max-w-2xl">

@@ -319,6 +319,9 @@ export function Configurator({ artwork, tiers }: Props) {
             </div>
           )}
         </div>
+        <p className="text-xs text-ink-muted leading-relaxed mt-3">
+          All sizes are offered in the same proportions as the original artwork — your print is never cropped or distorted.
+        </p>
       </div>
 
       {/* ── Step 3: Framing ──────────────────────────────────────────────── */}

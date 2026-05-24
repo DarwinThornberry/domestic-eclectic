@@ -44,9 +44,10 @@ const BAND_COLOUR: Record<string, string> = {
 
 interface Props {
   tiers: PricingTiers
+  activeSizes?: string[]
 }
 
-export function PricingCostsClient({ tiers }: Props) {
+export function PricingCostsClient({ tiers, activeSizes = [] }: Props) {
   const [material, setMaterial] = useState<MaterialTab>('cotton_rag_smooth')
   const [framingTab, setFramingTab] = useState<FramingTab>('unframed')
   const [shippingOpen, setShippingOpen] = useState(false)
@@ -131,65 +132,88 @@ export function PricingCostsClient({ tiers }: Props) {
       </div>
 
       {/* Cost table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border border-border">
-          <thead>
-            <tr className="bg-bone-dark border-b border-border">
-              <th className="text-left px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Size</th>
-              <th className="px-3 py-3 text-xs text-ink-muted font-normal tracking-wide text-center">Band</th>
-              <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Wholesale</th>
-              <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Customer price</th>
-              <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Your profit</th>
-              <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Margin</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sizes.map((size) => {
-              const wholesale = getWholesaleCostDollars(material as Material, size.key, currentFraming as Framing)
-              const band = getSizeBand(size.key)
-              if (wholesale === null) {
+      <div>
+        {activeSizes.length > 0 && (
+          <p className="text-xs text-ink-muted mb-3">
+            <span className="font-medium text-ink">{activeSizes.length}</span> sizes currently offered across your artworks — remaining rows are in the pricing engine but not shown to customers.
+          </p>
+        )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border border-border">
+            <thead>
+              <tr className="bg-bone-dark border-b border-border">
+                <th className="text-left px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Size</th>
+                <th className="px-3 py-3 text-xs text-ink-muted font-normal tracking-wide text-center">Band</th>
+                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Wholesale</th>
+                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Customer price</th>
+                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Your profit</th>
+                <th className="text-right px-5 py-3 text-xs text-ink-muted font-normal tracking-wide">Margin</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sizes.map((size) => {
+                const wholesale = getWholesaleCostDollars(material as Material, size.key, currentFraming as Framing)
+                const band = getSizeBand(size.key)
+                const isActive = activeSizes.length === 0 || activeSizes.includes(size.key)
+
+                if (wholesale === null) {
+                  return (
+                    <tr key={size.key} className={`border-t border-border ${!isActive ? 'opacity-40' : ''}`}>
+                      <td className="px-5 py-3 text-ink">{size.label}</td>
+                      <td className="px-3 py-3 text-center">
+                        <span className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}>
+                          {BAND_LABEL[band]}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 text-center text-ink-muted" colSpan={4}>—</td>
+                    </tr>
+                  )
+                }
+
+                const customerCents = calculatePrice(material as Material, size.key, currentFraming as Framing, tiers)!
+                const wholesaleCents = wholesale * 100
+                const profitCents = customerCents - wholesaleCents
+                const margin = ((profitCents / customerCents) * 100).toFixed(0)
+                const bandMarkup =
+                  band === 'small'  ? tiers.markupSmall  :
+                  band === 'medium' ? tiers.markupMedium :
+                                      tiers.markupLarge
+
                 return (
-                  <tr key={size.key} className="border-t border-border">
-                    <td className="px-5 py-3 text-ink">{size.label}</td>
+                  <tr
+                    key={size.key}
+                    className={`border-t border-border transition-colors ${
+                      isActive ? 'hover:bg-bone-dark/40' : 'opacity-40'
+                    }`}
+                  >
+                    <td className="px-5 py-3 text-ink">
+                      <span className="flex items-center gap-2">
+                        {size.label}
+                        {!isActive && (
+                          <span className="caption text-[9px] px-1.5 py-0.5 border border-border text-ink-muted">
+                            not offered
+                          </span>
+                        )}
+                      </span>
+                    </td>
                     <td className="px-3 py-3 text-center">
-                      <span className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}>
+                      <span
+                        className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}
+                        title={`${bandMarkup}× markup`}
+                      >
                         {BAND_LABEL[band]}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-center text-ink-muted" colSpan={4}>—</td>
+                    <td className="px-5 py-3 text-right text-ink-muted">{formatDollars(wholesaleCents)}</td>
+                    <td className="px-5 py-3 text-right text-ink font-medium">{formatDollars(customerCents)}</td>
+                    <td className="px-5 py-3 text-right text-olive">{formatDollars(profitCents)}</td>
+                    <td className="px-5 py-3 text-right text-ink-muted">{margin}%</td>
                   </tr>
                 )
-              }
-
-              const customerCents = calculatePrice(material as Material, size.key, currentFraming as Framing, tiers)!
-              const wholesaleCents = wholesale * 100
-              const profitCents = customerCents - wholesaleCents
-              const margin = ((profitCents / customerCents) * 100).toFixed(0)
-              const bandMarkup =
-                band === 'small'  ? tiers.markupSmall  :
-                band === 'medium' ? tiers.markupMedium :
-                                    tiers.markupLarge
-
-              return (
-                <tr key={size.key} className="border-t border-border hover:bg-bone-dark/40 transition-colors">
-                  <td className="px-5 py-3 text-ink">{size.label}</td>
-                  <td className="px-3 py-3 text-center">
-                    <span
-                      className={`caption text-[10px] px-1.5 py-0.5 ${BAND_COLOUR[band]}`}
-                      title={`${bandMarkup}× markup`}
-                    >
-                      {BAND_LABEL[band]}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right text-ink-muted">{formatDollars(wholesaleCents)}</td>
-                  <td className="px-5 py-3 text-right text-ink font-medium">{formatDollars(customerCents)}</td>
-                  <td className="px-5 py-3 text-right text-olive">{formatDollars(profitCents)}</td>
-                  <td className="px-5 py-3 text-right text-ink-muted">{margin}%</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Band legend */}
