@@ -285,6 +285,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
+      phone_number_collection: { enabled: true },
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['AU', 'NZ', 'US', 'GB', 'CA', 'DE', 'FR', 'NL', 'JP', 'SG'],

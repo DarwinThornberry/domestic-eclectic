@@ -132,6 +132,13 @@ export function printerEmailHtml(order: OrderWithItems): string {
   <p style="${styles.sectionLabel}">Ship To</p>
   ${printerAddressBlock(order)}
 
+  <p style="${styles.sectionLabel}">Contact</p>
+  <div style="padding: 16px 24px; background: #EAE0CC; border-left: 5px solid #1A1814;">
+    <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #1A1814; line-height: 2; margin: 0;">
+      <strong>Email:</strong> ${order.customer_email}${order.customer_phone ? `<br><strong>Phone:</strong> ${order.customer_phone}` : ''}
+    </p>
+  </div>
+
   <p style="${styles.footer}">
     Questions about this order? Contact Lara Stocco at lara@domesticeclectic.com.au<br>
     Domestic Eclectic · Fine Art Prints by Lara Stocco

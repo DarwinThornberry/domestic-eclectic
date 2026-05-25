@@ -83,6 +83,7 @@ export interface Order {
   status: OrderStatus
   customer_email: string
   customer_name: string
+  customer_phone: string | null
   shipping_address: ShippingAddress
   subtotal_aud: number
   shipping_aud: number

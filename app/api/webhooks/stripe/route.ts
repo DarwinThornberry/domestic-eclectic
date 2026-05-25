@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
           stripe_payment_intent: session.payment_intent as string,
           customer_email: customer?.email ?? '',
           customer_name: customer?.name ?? shipping?.name ?? '',
+          customer_phone: customer?.phone ?? null,
           shipping_address: {
             name: shipping?.name ?? customer?.name ?? '',
             line1: shipping?.address?.line1 ?? '',
