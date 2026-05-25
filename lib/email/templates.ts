@@ -124,6 +124,23 @@ function addressBlock(order: OrderWithItems): string {
   `
 }
 
+// Labelled field-by-field address for customer confirmation and admin notification
+function labelledAddressBlock(order: OrderWithItems): string {
+  const a = order.shipping_address
+  const lbl = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; font-weight: 700; color: #9A6B4F; text-transform: uppercase; letter-spacing: 1.5px; width: 72px; padding: 5px 14px 5px 0; vertical-align: top;`
+  const val = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #1A1814; padding: 5px 0; vertical-align: top; line-height: 1.5;`
+  const streetVal = a.line2 ? `${a.line1}<br>${a.line2}` : a.line1
+  const stateRow = a.state ? `<tr><td style="${lbl}">State</td><td style="${val}">${a.state}</td></tr>` : ''
+  return `<table cellpadding="0" cellspacing="0">
+    <tr><td style="${lbl}">Name</td><td style="${val}">${a.name}</td></tr>
+    <tr><td style="${lbl}">Street</td><td style="${val}">${streetVal}</td></tr>
+    <tr><td style="${lbl}">City</td><td style="${val}">${a.city}</td></tr>
+    ${stateRow}
+    <tr><td style="${lbl}">Postcode</td><td style="${val}">${a.postal_code}</td></tr>
+    <tr><td style="${lbl}">Country</td><td style="${val}">${a.country}</td></tr>
+  </table>`
+}
+
 // Large, bold ship-to address for the printer fulfilment email
 function printerAddressBlock(order: OrderWithItems): string {
   const a = order.shipping_address
@@ -208,7 +225,7 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
   ${customerItemsBlock(order)}
 
   <p style="${styles.sectionLabel}">Shipping To</p>
-  ${addressBlock(order)}
+  ${labelledAddressBlock(order)}
 
   <p style="${styles.sectionLabel}">Order Total</p>
   <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
@@ -275,12 +292,7 @@ export function adminNotificationHtml(order: OrderWithItems, siteUrl: string): s
   </table>
 
   <p style="${styles.sectionLabel}">Shipping Address</p>
-  <p style="${styles.address}">
-    ${a.name}<br>
-    ${a.line1}${a.line2 ? '<br>' + a.line2 : ''}<br>
-    ${a.city}${a.state ? ', ' + a.state : ''} ${a.postal_code}<br>
-    ${a.country}
-  </p>
+  ${labelledAddressBlock(order)}
 
   <p style="${styles.sectionLabel}">Items</p>
   ${adminItemsBlock(order)}
