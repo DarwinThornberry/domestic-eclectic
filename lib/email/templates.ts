@@ -37,7 +37,7 @@ function wordmark(): string {
   `
 }
 
-// Used by adminNotificationHtml and shippedNotificationHtml — unchanged
+// Used by shippedNotificationHtml — unchanged
 function itemsBlock(order: OrderWithItems): string {
   return order.order_items.map((item) => `
     <div style="margin-bottom: 16px;">
@@ -48,18 +48,40 @@ function itemsBlock(order: OrderWithItems): string {
   `).join('')
 }
 
-// Cleaner item layout for the customer confirmation email
+// Two-column item layout for the customer confirmation email
 function customerItemsBlock(order: OrderWithItems): string {
-  return order.order_items.map((item) => `
-    <div style="margin-bottom: 20px;">
-      <p style="${styles.itemTitle}">${item.artwork_title_snapshot}</p>
-      <p style="${styles.itemDetail}">${titleCase(item.material)} &middot; ${item.size.replace('x', ' &times; ')} mm &middot; ${titleCase(item.framing)} &middot; Qty&nbsp;${item.quantity}</p>
-      <p style="${styles.itemTotal}">Line total: ${formatCents(item.line_total_aud)}</p>
-    </div>
+  const rows = order.order_items.map((item) => `
+    <tr>
+      <td style="padding: 18px 0; border-bottom: 1px solid #E5DFD5; vertical-align: top;">
+        <p style="font-family: Georgia, serif; font-size: 16px; font-style: italic; color: #1A1814; margin: 0 0 5px;">${item.artwork_title_snapshot}</p>
+        <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #4A4540; line-height: 1.5; margin: 0;">${titleCase(item.material)} &middot; ${item.size.replace('x', ' &times; ')} mm &middot; ${titleCase(item.framing)}</p>
+      </td>
+      <td style="padding: 18px 0 18px 16px; border-bottom: 1px solid #E5DFD5; vertical-align: top; text-align: right; white-space: nowrap;">
+        <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 10px; color: #9A6B4F; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 5px;">Qty ${item.quantity}</p>
+        <p style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; margin: 0;">${formatCents(item.line_total_aud)}</p>
+      </td>
+    </tr>
   `).join('')
+  return `<table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">${rows}</table>`
 }
 
-// Invoice-style item table for the printer fulfilment email
+// Two-column item layout for the admin notification email (includes line totals)
+function adminItemsBlock(order: OrderWithItems): string {
+  const rows = order.order_items.map((item) => `
+    <tr>
+      <td style="padding: 12px 0; border-bottom: 1px solid #E5DFD5; vertical-align: top;">
+        <p style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; margin: 0 0 4px;">${item.artwork_title_snapshot}</p>
+        <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #4A4540; line-height: 1.5; margin: 0;">${titleCase(item.material)} &middot; ${item.size.replace('x', ' &times; ')} mm &middot; ${titleCase(item.framing)} &middot; Qty&nbsp;${item.quantity}</p>
+      </td>
+      <td style="padding: 12px 0 12px 16px; border-bottom: 1px solid #E5DFD5; vertical-align: top; text-align: right; white-space: nowrap;">
+        <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #1A1814; margin: 0;">${formatCents(item.line_total_aud)}</p>
+      </td>
+    </tr>
+  `).join('')
+  return `<table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">${rows}</table>`
+}
+
+// Invoice-style item table for the printer fulfilment email — NO pricing
 function printerInvoiceItemsBlock(order: OrderWithItems): string {
   const lbl = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; color: #1A1814; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; border-right: 1px solid #E5DFD5; width: 100px; vertical-align: top;`
   const val = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #1A1814; padding: 10px 14px; vertical-align: top;`
@@ -83,12 +105,8 @@ function printerInvoiceItemsBlock(order: OrderWithItems): string {
         <td style="${val} ${sep}">${titleCase(item.framing)}</td>
       </tr>
       <tr>
-        <td style="${lbl} ${sep}">Quantity</td>
-        <td style="${val} ${sep}">${item.quantity}</td>
-      </tr>
-      <tr style="background: #EAE0CC;">
-        <td style="${lbl}">Line total</td>
-        <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: 700; color: #1A1814; padding: 10px 14px; text-align: right; vertical-align: top;">${formatCents(item.line_total_aud)}</td>
+        <td style="${lbl}">Quantity</td>
+        <td style="${val}">${item.quantity}</td>
       </tr>
     </table>
   `).join('')
@@ -184,21 +202,34 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
   ${wordmark()}
   <h2 style="${styles.h2}">Thank you, ${firstName}.</h2>
   <p style="${styles.lead}">Your order has been confirmed. We'll be in touch when your print is on its way.</p>
+  <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; color: #9A6B4F; text-transform: uppercase; letter-spacing: 2px; margin: -16px 0 28px;">Order ${order.order_number} &middot; ${new Date(order.created_at).toLocaleDateString('en-AU', { dateStyle: 'long' })}</p>
 
-  <p style="${styles.sectionLabel}">Your Order — ${order.order_number}</p>
+  <p style="${styles.sectionLabel}">Your Items</p>
   ${customerItemsBlock(order)}
 
   <p style="${styles.sectionLabel}">Shipping To</p>
   ${addressBlock(order)}
 
   <p style="${styles.sectionLabel}">Order Total</p>
-  <p style="${styles.totalRow}">Subtotal: ${formatCents(order.subtotal_aud)}</p>
-  <p style="${styles.totalRow}">Shipping: ${formatCents(order.shipping_aud)}</p>
-  <p style="${styles.totalFinal}">Total: ${formatCents(order.total_aud)}</p>
+  <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 8px 0; border-bottom: 1px solid #E5DFD5;">Subtotal</td>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 8px 0; border-bottom: 1px solid #E5DFD5; text-align: right;">${formatCents(order.subtotal_aud)}</td>
+    </tr>
+    <tr>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 8px 0; border-bottom: 1px solid #E5DFD5;">Shipping</td>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 8px 0; border-bottom: 1px solid #E5DFD5; text-align: right;">${formatCents(order.shipping_aud)}</td>
+    </tr>
+    <tr>
+      <td style="font-family: Georgia, serif; font-size: 16px; font-style: italic; color: #1A1814; padding: 12px 0 0;">Total</td>
+      <td style="font-family: Georgia, serif; font-size: 16px; font-style: italic; color: #1A1814; padding: 12px 0 0; text-align: right;">${formatCents(order.total_aud)}</td>
+    </tr>
+  </table>
 
-  <p style="${styles.sectionLabel}">What happens next</p>
+  <p style="${styles.sectionLabel}">What Happens Next</p>
   <p style="${styles.small}">Your print will be produced on archival materials by Southern Buoy in Mornington, Victoria. Australian orders typically arrive within 7–14 business days of dispatch. You'll receive a shipping notification once your order leaves the studio.</p>
-  <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; color: #4A4540; margin-top: 12px;">This inbox is not monitored — please do not reply to this email. For any questions, visit our <a href="https://domesticeclectic.com.au/contact" style="color: #9A6B4F;">contact page</a>.</p>
+
+  <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; color: #4A4540; margin-top: 20px; padding-top: 16px; border-top: 1px solid #E5DFD5; line-height: 1.7;">This inbox is not monitored — please do not reply to this email. For any questions, visit our <a href="https://domesticeclectic.com.au/contact" style="color: #9A6B4F;">contact page</a>.</p>
 
   <p style="${styles.footer}">
     Domestic Eclectic · Fine Art Prints by Lara Stocco<br>
@@ -210,16 +241,66 @@ export function customerConfirmationHtml(order: OrderWithItems): string {
 }
 
 export function adminNotificationHtml(order: OrderWithItems, siteUrl: string): string {
+  const a = order.shipping_address
+  const kvLbl = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 11px; font-weight: 700; color: #4A4540; text-transform: uppercase; letter-spacing: 0.5px; width: 60px; padding: 4px 14px 4px 0; vertical-align: top;`
+  const kvVal = `font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #1A1814; padding: 4px 0; vertical-align: top;`
+  const discountRow = order.discount_aud > 0 ? `
+    <tr>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 6px 0; border-bottom: 1px solid #E5DFD5;">Discount${order.discount_code ? ` (${order.discount_code})` : ''}</td>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 6px 0; border-bottom: 1px solid #E5DFD5; text-align: right;">−${formatCents(order.discount_aud)}</td>
+    </tr>` : ''
+
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>New order — ${order.order_number}</title></head>
 <body style="${styles.body}">
 <div style="${styles.wrap}">
   ${wordmark()}
-  <h2 style="${styles.h2}">New order received.</h2>
+  <h2 style="${styles.h2}">New order.</h2>
+  <p style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #1A1814; margin: 0 0 4px;"><strong>${order.order_number}</strong> &middot; ${new Date(order.created_at).toLocaleDateString('en-AU', { dateStyle: 'long' })} &middot; ${formatCents(order.total_aud)}</p>
 
-  <p style="${styles.small}"><strong>${order.order_number}</strong> · ${formatCents(order.total_aud)} · ${order.customer_name} (${order.customer_email})</p>
-  <br>
-  ${itemsBlock(order)}
+  <p style="${styles.sectionLabel}">Customer</p>
+  <table cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="${kvLbl}">Name</td>
+      <td style="${kvVal}">${order.customer_name}</td>
+    </tr>
+    <tr>
+      <td style="${kvLbl}">Email</td>
+      <td style="${kvVal}"><a href="mailto:${order.customer_email}" style="color: #9A6B4F;">${order.customer_email}</a></td>
+    </tr>
+    <tr>
+      <td style="${kvLbl}">Phone</td>
+      <td style="${kvVal}">${order.customer_phone ?? '—'}</td>
+    </tr>
+  </table>
+
+  <p style="${styles.sectionLabel}">Shipping Address</p>
+  <p style="${styles.address}">
+    ${a.name}<br>
+    ${a.line1}${a.line2 ? '<br>' + a.line2 : ''}<br>
+    ${a.city}${a.state ? ', ' + a.state : ''} ${a.postal_code}<br>
+    ${a.country}
+  </p>
+
+  <p style="${styles.sectionLabel}">Items</p>
+  ${adminItemsBlock(order)}
+
+  <p style="${styles.sectionLabel}">Order Total</p>
+  <table cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 6px 0; border-bottom: 1px solid #E5DFD5;">Subtotal</td>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 6px 0; border-bottom: 1px solid #E5DFD5; text-align: right;">${formatCents(order.subtotal_aud)}</td>
+    </tr>
+    <tr>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 6px 0; border-bottom: 1px solid #E5DFD5;">Shipping</td>
+      <td style="font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #4A4540; padding: 6px 0; border-bottom: 1px solid #E5DFD5; text-align: right;">${formatCents(order.shipping_aud)}</td>
+    </tr>
+    ${discountRow}
+    <tr>
+      <td style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; padding: 10px 0 0;">Total</td>
+      <td style="font-family: Georgia, serif; font-size: 15px; font-style: italic; color: #1A1814; padding: 10px 0 0; text-align: right;">${formatCents(order.total_aud)}</td>
+    </tr>
+  </table>
 
   <a href="${siteUrl}/admin/orders/${order.id}" style="${styles.btn}">View order in studio</a>
 
