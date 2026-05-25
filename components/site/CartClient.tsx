@@ -12,8 +12,7 @@ import { ArtworkMonogram } from '@/components/ui/ArtworkMonogram'
 
 const COUNTRIES = [
   { code: 'AU', label: 'Australia' },
-  { code: 'NZ', label: 'New Zealand' },
-  { code: 'WORLD', label: 'Rest of World' },
+  { code: 'INTL', label: 'International' },
 ]
 
 interface Props {
@@ -37,13 +36,15 @@ export function CartClient({ storeLive }: Props) {
     amountAud: number
   } | null>(null)
 
-  const shippingAud = mounted && items.length
+  const shippingRaw = mounted && items.length
     ? calculateShipping(
         items.map((i) => ({ size: i.size, framing: i.framing, quantity: i.quantity })),
         country,
       )
     : 0
 
+  const shippingOnRequest = shippingRaw === null
+  const shippingAud = shippingRaw ?? 0
   const subtotalAud = totals.subtotalAud
   const discountAud = discountPreview?.amountAud ?? 0
   const totalAud = subtotalAud + shippingAud - discountAud
@@ -282,7 +283,9 @@ export function CartClient({ storeLive }: Props) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-ink-muted">Shipping</span>
-                  <span className="text-ink">{formatPrice(shippingAud)}</span>
+                  <span className="text-ink">
+                    {shippingOnRequest ? 'Contact for quote' : formatPrice(shippingAud)}
+                  </span>
                 </div>
 
                 {discountPreview && (
@@ -307,7 +310,9 @@ export function CartClient({ storeLive }: Props) {
 
               <div className="flex justify-between py-4 border-t border-border">
                 <span className="font-display italic text-ink text-lg">Total</span>
-                <span className="font-display italic text-ink text-lg">{formatPrice(Math.max(0, totalAud))}</span>
+                <span className="font-display italic text-ink text-lg">
+                  {shippingOnRequest ? '—' : formatPrice(Math.max(0, totalAud))}
+                </span>
               </div>
 
               {/* Discount code — only show when store is live */}
@@ -365,9 +370,15 @@ export function CartClient({ storeLive }: Props) {
                       {error}
                     </p>
                   )}
+                  {shippingOnRequest && (
+                    <p className="text-xs text-terracotta border border-terracotta/30 bg-terracotta/5 px-3 py-2 mb-4 text-center">
+                      Framed international shipping is available on request —{' '}
+                      <a href="/contact" className="underline">contact us</a> for a quote.
+                    </p>
+                  )}
                   <button
                     onClick={handleCheckout}
-                    disabled={loading}
+                    disabled={loading || shippingOnRequest}
                     className="w-full py-4 bg-ink text-bone text-sm hover:bg-terracotta transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
                   >
                     {loading ? (

@@ -26,7 +26,7 @@ export const CONTACT_ADMIN_EMAIL = 'lara@domesticeclectic.com.au'
 
 export async function sendPrinterEmail(order: OrderWithItems) {
   const resend = getResend()
-  const printerEmail = process.env.PRINTER_EMAIL ?? 'southernbuoy@gmail.com'
+  const printerEmail = process.env.PRINTER_EMAIL ?? 'crew@southernbuoy.com.au'
 
   await resend.emails.send({
     from: FROM_ADDRESS,

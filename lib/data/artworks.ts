@@ -1,3 +1,4 @@
+
 /**
  * Artwork data — single source of truth for Phase 1–3.
  * In Phase 4 this is replaced by Supabase queries; the shape stays the same.

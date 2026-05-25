@@ -113,9 +113,9 @@ const COTTON_RAG_PRINT: Record<string, number> = {
 
 /** Cotton Rag — print + standard frame (Flooded Gum or American Ash) */
 const COTTON_RAG_STANDARD_FRAME: Record<string, number> = {
-  '210x297': 90,
-  '297x420': 138,
-  '420x594': 174,
+  '210x297': 70,
+  '297x420': 108,
+  '420x594': 173,
   '594x841': 290,
   '841x1189': 495,
   '300x300': 97,
@@ -346,12 +346,11 @@ function tubeLengthMm(size: string): number {
   return Math.max(...size.split('x').map(Number)) + 50
 }
 
-type Country = 'AU' | 'NZ' | 'WORLD'
+type Country = 'AU' | 'INTL'
 
 function getCountryZone(countryCode: string): Country {
   if (countryCode === 'AU') return 'AU'
-  if (countryCode === 'NZ') return 'NZ'
-  return 'WORLD'
+  return 'INTL'
 }
 
 interface CartItemForShipping {
@@ -363,17 +362,20 @@ interface CartItemForShipping {
 export function calculateShipping(
   items: CartItemForShipping[],
   countryCode: string,
-): number {
+): number | null {
   const zone = getCountryZone(countryCode)
   let maxShippingCents = 0
 
   for (const item of items) {
     const isFramed = item.framing !== 'unframed'
     const longest = longestEdge(item.size)
-    const rateDollars = isFramed
-      ? framedRate(zone, longest)
-      : rolledRate(zone, tubeLengthMm(item.size))
-    maxShippingCents = Math.max(maxShippingCents, Math.round(rateDollars * 100))
+    if (isFramed) {
+      const rate = framedRate(zone, longest)
+      if (rate === null) return null
+      maxShippingCents = Math.max(maxShippingCents, Math.round(rate * 100))
+    } else {
+      maxShippingCents = Math.max(maxShippingCents, Math.round(rolledRate(zone, tubeLengthMm(item.size)) * 100))
+    }
   }
 
   return maxShippingCents
@@ -383,48 +385,32 @@ export function rolledRate(zone: Country, tubeMm: number): number {
   const tubeCm = tubeMm / 10
 
   if (zone === 'AU') {
-    if (tubeCm <= 90) return 9.95
-    if (tubeCm <= 120) return 24.95
-    return 39.95
+    if (tubeCm <= 90) return 11.95
+    if (tubeCm <= 120) return 28.70
+    return 45.90
   }
 
-  if (zone === 'NZ') {
-    if (tubeCm <= 45) return 44.95
-    if (tubeCm <= 70) return 64.95
-    if (tubeCm <= 100) return 79.95
-    if (tubeCm <= 120) return 89.95
-    return 129.95
-  }
-
-  // Rest of world
-  if (tubeCm <= 45) return 49.95
-  if (tubeCm <= 70) return 69.95
-  if (tubeCm <= 100) return 89.95
-  if (tubeCm <= 120) return 119.95
-  return 169.95
+  // International — single tier (2026 info pack)
+  if (tubeCm <= 45) return 72.00
+  if (tubeCm <= 70) return 114.95
+  if (tubeCm <= 100) return 130.00
+  if (tubeCm <= 120) return 173.00
+  return 246.00
 }
 
-export function framedRate(zone: Country, longestEdgeMm: number): number {
+export function framedRate(zone: Country, longestEdgeMm: number): number | null {
   const cm = longestEdgeMm / 10
 
   if (zone === 'AU') {
-    if (cm <= 90) return 39.95
-    if (cm <= 120) return 89.95
-    if (cm <= 150) return 119.95
-    if (cm <= 190) return 169.95
-    return 295.95
+    if (cm <= 90) return 45.90
+    if (cm <= 120) return 103.45
+    if (cm <= 150) return 137.95
+    if (cm <= 190) return 237.95
+    return 340.34
   }
 
-  if (zone === 'NZ') {
-    if (cm <= 50) return 89.95
-    if (cm <= 80) return 249.95
-    if (cm <= 100) return 349.95
-    if (cm <= 120) return 599.95
-    return 749.95
-  }
-
-  // International framed — use rolled world rates as fallback
-  return rolledRate(zone, longestEdgeMm + 50)
+  // International framed: available on request (2026 info pack)
+  return null
 }
 
 // ─── Shipping reference data (for admin cost table) ───────────────────────────
@@ -432,8 +418,8 @@ export function framedRate(zone: Country, longestEdgeMm: number): number {
 export interface ShippingReferenceRow {
   label: string
   size: string
-  rolled: { AU: number; NZ: number; WORLD: number }  // cents
-  framed: { AU: number; NZ: number; WORLD: number }  // cents
+  rolled: { AU: number; INTL: number }              // cents
+  framed: { AU: number; INTL: number | null }       // cents; null = available on request
 }
 
 export function getShippingReference(): ShippingReferenceRow[] {
@@ -453,18 +439,17 @@ export function getShippingReference(): ShippingReferenceRow[] {
   return sizes.map(({ label, size }) => {
     const tube    = Math.max(...size.split('x').map(Number)) + 50
     const longest = Math.max(...size.split('x').map(Number))
+    const framedIntl = framedRate('INTL', longest)
     return {
       label,
       size,
       rolled: {
-        AU:    Math.round(rolledRate('AU',    tube) * 100),
-        NZ:    Math.round(rolledRate('NZ',    tube) * 100),
-        WORLD: Math.round(rolledRate('WORLD', tube) * 100),
+        AU:   Math.round(rolledRate('AU',   tube) * 100),
+        INTL: Math.round(rolledRate('INTL', tube) * 100),
       },
       framed: {
-        AU:    Math.round(framedRate('AU',    longest) * 100),
-        NZ:    Math.round(framedRate('NZ',    longest) * 100),
-        WORLD: Math.round(framedRate('WORLD', longest) * 100),
+        AU:   Math.round(framedRate('AU', longest)! * 100),
+        INTL: framedIntl !== null ? Math.round(framedIntl * 100) : null,
       },
     }
   })

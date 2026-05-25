@@ -5,13 +5,13 @@ export const metadata = { title: 'Notifications' }
 
 export default async function NotificationsPage() {
   let adminEmail = ''
-  let printerEmail = 'southernbuoy@gmail.com'
+  let printerEmail = 'crew@southernbuoy.com.au'
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const supabase = createAdminClient()
     const { data } = await supabase.from('settings').select('admin_email, printer_email').eq('id', 1).single()
     adminEmail = data?.admin_email ?? ''
-    printerEmail = data?.printer_email ?? 'southernbuoy@gmail.com'
+    printerEmail = data?.printer_email ?? 'crew@southernbuoy.com.au'
   }
 
   return (

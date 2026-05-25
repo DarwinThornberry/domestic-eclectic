@@ -26,7 +26,7 @@ EMAIL_FROM=Domestic Eclectic <studio@yourdomain.com>
 # Site
 NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 ADMIN_EMAIL=your@email.com
-PRINTER_EMAIL=southernbuoy@gmail.com
+PRINTER_EMAIL=crew@southernbuoy.com.au
 ```
 
 You can find these values in:

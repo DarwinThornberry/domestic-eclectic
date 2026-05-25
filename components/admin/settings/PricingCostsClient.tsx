@@ -292,9 +292,9 @@ export function PricingCostsClient({ tiers, activeSizes = [], initialGlobalOverr
         {shippingOpen && (
           <div className="border-t border-border px-5 py-4">
             <p className="text-xs text-ink-muted mb-4 leading-relaxed">
-              Southern Buoy's published shipping rates (AUD). Rolled = unframed print in a tube.
-              Framed = packaged artwork. International framed rates are estimated — confirm with
-              Southern Buoy for exact quotes.
+              Southern Buoy's published shipping rates (AUD) — 2026 info pack. Rolled = unframed
+              print in a tube. International framed prints are available on request only; contact
+              Southern Buoy for a quote.
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
@@ -303,10 +303,8 @@ export function PricingCostsClient({ tiers, activeSizes = [], initialGlobalOverr
                     <th className="text-left py-2 pr-4 text-ink-muted font-normal">Size</th>
                     <th className="text-right py-2 px-3 text-ink-muted font-normal">AU Rolled</th>
                     <th className="text-right py-2 px-3 text-ink-muted font-normal">AU Framed</th>
-                    <th className="text-right py-2 px-3 text-ink-muted font-normal">NZ Rolled</th>
-                    <th className="text-right py-2 px-3 text-ink-muted font-normal">NZ Framed</th>
-                    <th className="text-right py-2 px-3 text-ink-muted font-normal">World Rolled</th>
-                    <th className="text-right py-2 pl-3 text-ink-muted font-normal">World Framed</th>
+                    <th className="text-right py-2 px-3 text-ink-muted font-normal">Int'l Rolled</th>
+                    <th className="text-right py-2 pl-3 text-ink-muted font-normal">Int'l Framed</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -315,10 +313,10 @@ export function PricingCostsClient({ tiers, activeSizes = [], initialGlobalOverr
                       <td className="py-2 pr-4 text-ink">{row.label}</td>
                       <td className="py-2 px-3 text-right text-ink-muted">{formatDollars(row.rolled.AU)}</td>
                       <td className="py-2 px-3 text-right text-ink-muted">{formatDollars(row.framed.AU)}</td>
-                      <td className="py-2 px-3 text-right text-ink-muted">{formatDollars(row.rolled.NZ)}</td>
-                      <td className="py-2 px-3 text-right text-ink-muted">{formatDollars(row.framed.NZ)}</td>
-                      <td className="py-2 px-3 text-right text-ink-muted">{formatDollars(row.rolled.WORLD)}</td>
-                      <td className="py-2 pl-3 text-right text-ink-muted">{formatDollars(row.framed.WORLD)}</td>
+                      <td className="py-2 px-3 text-right text-ink-muted">{formatDollars(row.rolled.INTL)}</td>
+                      <td className="py-2 pl-3 text-right text-ink-muted">
+                        {row.framed.INTL !== null ? formatDollars(row.framed.INTL) : <span className="italic">On request</span>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

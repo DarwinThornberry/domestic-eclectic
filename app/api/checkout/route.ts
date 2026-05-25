@@ -150,6 +150,13 @@ export async function POST(request: NextRequest) {
       country ?? 'AU',
     )
 
+    if (shippingAud === null) {
+      return NextResponse.json(
+        { error: 'Framed international shipping is available on request — please contact us for a quote.' },
+        { status: 400 },
+      )
+    }
+
     const subtotalAud = validatedItems.reduce((sum, i) => sum + i.line_total_aud, 0)
 
     // ── 4. Compute discount amount server-side ────────────────────────────────
