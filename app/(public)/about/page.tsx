@@ -1,21 +1,36 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
+import { getAboutPhotoUrl } from '@/lib/data/artworks-db'
 
 export const metadata: Metadata = {
   title: 'About',
   description: 'About Lara Stocco — Melbourne-based artist and creator of Domestic Eclectic.',
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const aboutPhotoUrl = await getAboutPhotoUrl()
+
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-12 pb-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
-        {/* Image placeholder */}
+        {/* Studio photo */}
         <div className="relative aspect-[3/4] bg-bone-dark overflow-hidden order-1 lg:order-none">
-          <div className="absolute inset-0 flex items-center justify-center opacity-10">
-            <p className="font-display text-7xl italic text-ink select-none">LS</p>
-          </div>
+          {aboutPhotoUrl ? (
+            <Image
+              src={aboutPhotoUrl}
+              alt="Lara Stocco"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center opacity-10">
+              <p className="font-display text-7xl italic text-ink select-none">LS</p>
+            </div>
+          )}
         </div>
 
         {/* Text */}

@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, X } from 'lucide-react'
 import { saveSettings } from '@/app/admin/actions'
+import { ImageUpload } from '@/components/admin/ImageUpload'
 
 interface Props {
   studioName: string
   contactEmail: string
   instagramUrl: string
+  aboutPhotoUrl: string | null
 }
 
 function Field({ label, help, children }: { label: string; help?: string; children: React.ReactNode }) {
@@ -20,10 +22,16 @@ function Field({ label, help, children }: { label: string; help?: string; childr
   )
 }
 
-export function StudioClient({ studioName: initial_name, contactEmail: initial_email, instagramUrl: initial_ig }: Props) {
+export function StudioClient({
+  studioName: initial_name,
+  contactEmail: initial_email,
+  instagramUrl: initial_ig,
+  aboutPhotoUrl: initial_about_photo,
+}: Props) {
   const [studioName, setStudioName] = useState(initial_name)
   const [contactEmail, setContactEmail] = useState(initial_email)
   const [instagramUrl, setInstagramUrl] = useState(initial_ig)
+  const [aboutPhotoUrl, setAboutPhotoUrl] = useState(initial_about_photo)
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,6 +45,7 @@ export function StudioClient({ studioName: initial_name, contactEmail: initial_e
           studio_name: studioName,
           contact_email: contactEmail,
           instagram_url: instagramUrl || null,
+          about_photo_url: aboutPhotoUrl || null,
         })
         setSaved(true)
       } catch (e: any) {
@@ -67,6 +76,32 @@ export function StudioClient({ studioName: initial_name, contactEmail: initial_e
           onChange={(e) => { setContactEmail(e.target.value); setSaved(false) }}
           className="w-full border border-border bg-transparent px-4 py-3 text-sm text-ink focus:outline-none focus:border-ink transition-colors"
         />
+      </Field>
+
+      <Field label="About page photo" help="Shown beside your bio on the site's About page.">
+        {aboutPhotoUrl ? (
+          <div className="relative w-40 h-40 border border-border overflow-hidden">
+            <img src={aboutPhotoUrl} alt="About page photo" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={() => { setAboutPhotoUrl(null); setSaved(false) }}
+              title="Remove photo"
+              className="absolute top-1 right-1 bg-ink text-bone rounded-full p-0.5 hover:bg-terracotta transition-colors"
+            >
+              <X size={10} />
+            </button>
+          </div>
+        ) : (
+          <ImageUpload
+            label=""
+            helpText=""
+            bucket="artwork-public"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            maxMB={20}
+            showPreview={false}
+            onUpload={(url) => { setAboutPhotoUrl(url); setSaved(false) }}
+          />
+        )}
       </Field>
 
       <Field label="Instagram URL (optional)">

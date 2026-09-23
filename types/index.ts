@@ -142,6 +142,7 @@ export interface Settings {
   studio_name: string
   contact_email: string
   instagram_url: string | null
+  about_photo_url: string | null
   updated_at: string
 }
 

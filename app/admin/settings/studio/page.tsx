@@ -7,17 +7,19 @@ export default async function StudioPage() {
   let studioName = 'Domestic Eclectic'
   let contactEmail = ''
   let instagramUrl = ''
+  let aboutPhotoUrl: string | null = null
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const supabase = createAdminClient()
     const { data } = await supabase
       .from('settings')
-      .select('studio_name, contact_email, instagram_url')
+      .select('studio_name, contact_email, instagram_url, about_photo_url')
       .eq('id', 1)
       .single()
     studioName = data?.studio_name ?? 'Domestic Eclectic'
     contactEmail = data?.contact_email ?? ''
     instagramUrl = data?.instagram_url ?? ''
+    aboutPhotoUrl = data?.about_photo_url ?? null
   }
 
   return (
@@ -27,7 +29,12 @@ export default async function StudioPage() {
         <h1 className="font-display text-4xl italic text-ink">Studio Profile</h1>
         <p className="text-sm text-ink-muted mt-2">Your studio's public-facing details.</p>
       </div>
-      <StudioClient studioName={studioName} contactEmail={contactEmail} instagramUrl={instagramUrl} />
+      <StudioClient
+        studioName={studioName}
+        contactEmail={contactEmail}
+        instagramUrl={instagramUrl}
+        aboutPhotoUrl={aboutPhotoUrl}
+      />
     </div>
   )
 }

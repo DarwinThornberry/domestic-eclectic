@@ -15,6 +15,18 @@ export async function getMarkup(): Promise<number> {
   }
 }
 
+/** Fetches the About page studio photo URL from DB settings. Null if none has been uploaded. */
+export async function getAboutPhotoUrl(): Promise<string | null> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return null
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.from('settings').select('about_photo_url').eq('id', 1).single()
+    return data?.about_photo_url ?? null
+  } catch {
+    return null
+  }
+}
+
 /** Fetches the three-tier markup + rounding settings from DB. Safe to call from server components. */
 export async function getPricingTiers(): Promise<PricingTiers> {
   const { tiers } = await getPricingSettings()
