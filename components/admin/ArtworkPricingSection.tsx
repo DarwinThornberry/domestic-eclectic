@@ -131,12 +131,28 @@ const ALL_SIZES = [
   ...SIZE_GROUPS.rectangular,
 ]
 
+const SIZE_GROUP_LABELS: Record<string, string> = {
+  standard: 'A-SERIES',
+  square: 'SQUARE',
+  rectangular: 'RECTANGULAR',
+}
+
+// A size "works well" for an artwork when its long:short ratio is close to the artwork's own —
+// orientation-agnostic, since a print can be offered in either orientation.
+function isRecommendedSize(size: { w: number; h: number }, aspectRatio: number | null | undefined): boolean {
+  if (!aspectRatio) return false
+  const artworkRatio = Math.max(aspectRatio, 1 / aspectRatio)
+  const sizeRatio = Math.max(size.w, size.h) / Math.min(size.w, size.h)
+  return Math.abs(sizeRatio - artworkRatio) / artworkRatio <= 0.1
+}
+
 interface Props {
   artworkId: string
   initialPricingMode: PricingMode
   initialFixedPrices: Record<string, number> | null
   initialPriceOverrides: Record<string, number> | null
-  allowedSizes?: string[] | null
+  initialAllowedSizes?: string[] | null
+  aspectRatio?: number | null
   tiers: PricingTiers
 }
 
@@ -145,7 +161,8 @@ export function ArtworkPricingSection({
   initialPricingMode,
   initialFixedPrices,
   initialPriceOverrides,
-  allowedSizes,
+  initialAllowedSizes,
+  aspectRatio,
   tiers,
 }: Props) {
   const [useCustomPrices, setUseCustomPrices] = useState(
@@ -159,15 +176,29 @@ export function ArtworkPricingSection({
     initialPriceOverrides ?? initialFixedPrices ?? {},
   )
 
+  // Sizes offered — if this artwork has never had a selection saved, start from the
+  // aspect-ratio recommendation; otherwise respect exactly what was saved (including "none").
+  const [allowedSizes, setAllowedSizes] = useState<string[]>(() => {
+    if (initialAllowedSizes == null) {
+      return ALL_SIZES.filter((s) => isRecommendedSize(s, aspectRatio)).map((s) => s.key)
+    }
+    return initialAllowedSizes
+  })
+
   const [isPending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [viewOpen, setViewOpen] = useState(false)
 
-  // Show only the artwork's offered sizes; fall back to all sizes if none configured
-  const sizesToShow = allowedSizes?.length
-    ? ALL_SIZES.filter((s) => allowedSizes.includes(s.key))
-    : ALL_SIZES
+  function toggleSize(key: string) {
+    setAllowedSizes((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+    )
+    setSaved(false)
+  }
+
+  // Only the ticked sizes get a custom-price row
+  const sizesToShow = ALL_SIZES.filter((s) => allowedSizes.includes(s.key))
 
   function commitPrice(key: string, dollars: string) {
     const cents = Math.round(parseFloat(dollars) * 100)
@@ -194,7 +225,7 @@ export function ArtworkPricingSection({
 
     startTransition(async () => {
       try {
-        await saveArtworkPricing(artworkId, 'default', null, null, null, null, null, priceOverridesData)
+        await saveArtworkPricing(artworkId, 'default', null, null, null, null, null, priceOverridesData, allowedSizes)
         setSaved(true)
       } catch (e: any) {
         setError(e.message ?? 'Could not save.')
@@ -205,7 +236,44 @@ export function ArtworkPricingSection({
   return (
     <div className="flex flex-col gap-6 pt-4 border-t border-border">
 
-      <div className="flex items-center justify-between">
+      {/* Sizes offered */}
+      <div>
+        <h2 className="caption text-ink tracking-[0.12em] mb-1">SIZES OFFERED</h2>
+        <p className="text-xs text-ink-muted mb-4 leading-relaxed">
+          Every size Southern Buoy prints. Ticked sizes are what customers can buy for this work —
+          {aspectRatio ? ' sizes close to its shape are pre-ticked, but tick or untick anything.' : ' upload a web image above to get shape-matched suggestions.'}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {(['standard', 'square', 'rectangular'] as const).map((group) => (
+            <div key={group}>
+              <p className="caption text-ink-muted text-[10px] tracking-[0.12em] mb-2">
+                {SIZE_GROUP_LABELS[group]}
+              </p>
+              <div className="flex flex-col gap-2">
+                {SIZE_GROUPS[group].map((size) => {
+                  const recommended = isRecommendedSize(size, aspectRatio)
+                  return (
+                    <label key={size.key} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={allowedSizes.includes(size.key)}
+                        onChange={() => toggleSize(size.key)}
+                        className="accent-ink w-4 h-4 shrink-0"
+                      />
+                      <span className="text-sm text-ink">{size.dims}</span>
+                      {recommended && (
+                        <span className="caption text-[9px] text-olive tracking-[0.08em]">SUGGESTED</span>
+                      )}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-2 border-t border-border">
         <p className="text-xs text-ink-muted">
           {useCustomPrices
             ? 'This work uses custom prices.'
@@ -229,7 +297,13 @@ export function ArtworkPricingSection({
         <span className="text-sm text-ink">Set custom prices for this work</span>
       </label>
 
-      {useCustomPrices && (
+      {useCustomPrices && sizesToShow.length === 0 && (
+        <p className="text-xs text-ink-muted pl-7 border-l-2 border-border py-2">
+          Tick at least one size above to set a custom price for it.
+        </p>
+      )}
+
+      {useCustomPrices && sizesToShow.length > 0 && (
         <div className="flex flex-col gap-7 pl-7 border-l-2 border-border">
           {sizesToShow.map((size) => (
             <div key={size.key}>

@@ -196,6 +196,7 @@ export function ArtworkDetail({
         <Lightbox
           src={activeImage}
           alt={artwork.title}
+          aspectRatio={artwork.aspectRatio}
           onClose={() => setLightboxOpen(false)}
         />
       )}

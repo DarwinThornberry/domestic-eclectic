@@ -9,9 +9,11 @@ interface LightboxProps {
   src: string
   alt: string
   onClose: () => void
+  /** width ÷ height — sizes the container so the image has real dimensions to fill */
+  aspectRatio?: number
 }
 
-export function Lightbox({ src, alt, onClose }: LightboxProps) {
+export function Lightbox({ src, alt, onClose, aspectRatio = 1 }: LightboxProps) {
   // Close on Escape key
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
@@ -46,8 +48,11 @@ export function Lightbox({ src, alt, onClose }: LightboxProps) {
 
       {/* Image — click inside doesn't close */}
       <div
-        className="relative max-w-5xl w-full max-h-[90vh]"
-        style={{ aspectRatio: 'auto' }}
+        className="relative"
+        style={{
+          width: `min(90vw, calc(90vh * ${aspectRatio}))`,
+          height: `min(90vh, calc(90vw / ${aspectRatio}))`,
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute inset-0">

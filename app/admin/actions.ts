@@ -215,6 +215,7 @@ export async function saveArtworkPricing(
   customMarkupMedium?: number | null,
   customMarkupLarge?: number | null,
   priceOverrides?: Record<string, number> | null,
+  allowedSizes?: string[] | null,
 ) {
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -227,10 +228,12 @@ export async function saveArtworkPricing(
       custom_markup_medium:  customMarkupMedium ?? null,
       custom_markup_large:   customMarkupLarge  ?? null,
       price_overrides:       priceOverrides     ?? null,
+      allowed_sizes:         allowedSizes       ?? null,
     })
     .eq('id', artworkId)
   if (error) throw new Error(error.message)
   revalidatePath(`/admin/artworks/${artworkId}/edit`)
+  revalidatePath('/works', 'layout')
 }
 
 // ─── Contact messages ─────────────────────────────────────────────────────────

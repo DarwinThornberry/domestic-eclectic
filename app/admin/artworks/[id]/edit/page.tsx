@@ -157,7 +157,8 @@ export default async function EditArtworkPage({ params }: { params: Promise<{ id
           initialPricingMode={a.pricing_mode ?? 'default'}
           initialFixedPrices={a.fixed_prices ?? null}
           initialPriceOverrides={a.price_overrides ?? null}
-          allowedSizes={a.allowed_sizes ?? null}
+          initialAllowedSizes={a.allowed_sizes ?? null}
+          aspectRatio={a.aspect_ratio ?? null}
           tiers={tiers}
         />
       </div>

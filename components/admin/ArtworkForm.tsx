@@ -73,6 +73,7 @@ export function ArtworkForm({ artwork }: Props) {
     is_published: artwork?.is_published ?? false,
     thumbnail_url: artwork?.thumbnail_url ?? '',
     gallery_images: artwork?.gallery_images ?? [],
+    aspect_ratio: artwork?.aspect_ratio ?? null as number | null,
   })
 
   function set(key: keyof typeof form, value: unknown) {
@@ -215,9 +216,17 @@ export function ArtworkForm({ artwork }: Props) {
           accept="image/jpeg,image/jpg,image/png,image/webp"
           maxMB={30}
           showPreview
-          onUpload={(url) => set('thumbnail_url', url)}
+          onUpload={(url, dims) => {
+            set('thumbnail_url', url)
+            if (dims) set('aspect_ratio', dims.width / dims.height)
+          }}
           initialUrl={form.thumbnail_url || null}
         />
+        {form.aspect_ratio && (
+          <p className="text-xs text-ink-muted -mt-4">
+            Detected shape: {form.aspect_ratio.toFixed(2)}:1 ({form.aspect_ratio >= 1 ? 'landscape' : 'portrait'}). Used to size the frame and zoom view — sizes offered are set below in Pricing.
+          </p>
+        )}
 
         {/* Gallery images */}
         <Field

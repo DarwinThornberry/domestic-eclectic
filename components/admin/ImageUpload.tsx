@@ -12,8 +12,24 @@ interface Props {
   accept?: string
   maxMB?: number
   showPreview?: boolean
-  onUpload: (url: string) => void
+  onUpload: (url: string, dims?: { width: number; height: number }) => void
   initialUrl?: string | null
+}
+
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+    const objectUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      resolve({ width: img.naturalWidth, height: img.naturalHeight })
+      URL.revokeObjectURL(objectUrl)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      reject(new Error('Could not read image dimensions'))
+    }
+    img.src = objectUrl
+  })
 }
 
 export function ImageUpload({
@@ -80,7 +96,11 @@ export function ImageUpload({
       setPreviewUrl(showPreview ? previewUrl : null)
       setState('done')
       setProgress(100)
-      onUpload(url)
+
+      const dims = file.type.startsWith('image/')
+        ? await getImageDimensions(file).catch(() => undefined)
+        : undefined
+      onUpload(url, dims)
     } catch (e: any) {
       setState('error')
       setError(e.message ?? 'Upload failed. Please try again.')
