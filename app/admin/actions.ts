@@ -191,6 +191,7 @@ export async function saveSettings(data: Partial<Omit<Settings, 'id' | 'updated_
     .upsert({ id: 1, ...data, updated_at: new Date().toISOString() })
   if (error) throw new Error(error.message)
   revalidatePath('/admin/settings', 'layout')
+  revalidatePath('/about')
 }
 
 export async function saveGlobalPriceOverrides(overrides: Record<string, number>) {
