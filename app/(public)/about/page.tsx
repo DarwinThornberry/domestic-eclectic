@@ -42,29 +42,31 @@ export default async function AboutPage() {
 
           <div className="flex flex-col gap-5 text-ink leading-relaxed">
             <p>
-              Lara Stocco is a Melbourne-based mixed-media artist whose work draws
-              from the deep archives of art history — Botticelli&apos;s gilded
-              figures, Vermeer&apos;s interior light, Frida Kahlo&apos;s
-              unflinching self-regard — and layers them against botanical
-              illustration, Victorian shell taxonomy, and vintage portraiture.
+              My name is Lara, and I&apos;m a Melbournian artist with an
+              indelible passion for color, shape, and the coalescence of many
+              parts into a unified entity. Often, my work incorporates a
+              combination of history, architecture, and the human personality,
+              mixed with the warmth and vibrancy of nature and its forms.
+              Despite assumed incompatibility, it&apos;s the connection of these
+              two worlds that makes my work feel true and whole.
             </p>
             <p>
-              The result is dense, maximalist collage: compositions that reward
-              close looking, where a butterfly wing might brush against a Flemish
-              interior, and a shell from a 19th-century natural history catalogue
-              sits beside a Renaissance Venus.
+              What comes first can only be described as chaos. A mismatched
+              layout of various source materials; books, posters, magazines,
+              prints, all collated by chance encounter throughout my daily life.
             </p>
             <p>
-              Her work is made entirely by hand in her Melbourne studio. Each
-              piece begins with the accumulation of source material — books,
-              prints, found images — and proceeds through a process of
-              tearing, cutting, painting, and layering until the image arrives
-              at something that feels both inevitable and strange.
+              Then, I go through a multi-week, hand done process of matching
+              pieces, cutting images, and painting to restore lost vibrance,
+              forming a dense, maximalist collage; strange yet comfortable,
+              intertwining periods and styles of the past in ways that would
+              never occur on their own.
             </p>
             <p>
-              Domestic Eclectic is the home for archival fine art prints of her
-              work, produced by Southern Buoy in Mornington, Victoria, on
-              materials chosen to last.
+              All of my work is pieced together by me in my Melbourne studio.
+              With the help of Southern Buoy in Mornington, Victoria, with their
+              high quality, lasting materials, archival prints of my work can be
+              purchased here on Domestic Eclectic.
             </p>
           </div>
 
